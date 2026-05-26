@@ -1,6 +1,69 @@
 'use client'
+import { forwardRef } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+
+type AudioContextConstructor = new () => AudioContext
+type WebAudioWindow = Window & typeof globalThis & {
+  webkitAudioContext?: AudioContextConstructor
+}
+
+function playHoverClick() {
+  try {
+    const AudioContextClass =
+      window.AudioContext || (window as WebAudioWindow).webkitAudioContext
+
+    if (!AudioContextClass) return
+
+    const ctx = new AudioContextClass()
+
+    // Short transient noise burst — the "click"
+    const bufferSize = ctx.sampleRate * 0.025
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
+    const data = buffer.getChannelData(0)
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 8)
+    }
+    const noise = ctx.createBufferSource()
+    noise.buffer = buffer
+
+    // Bandpass to make it crisp, not hissy
+    const bp = ctx.createBiquadFilter()
+    bp.type = 'bandpass'
+    bp.frequency.value = 3200
+    bp.Q.value = 1.2
+
+    const noiseGain = ctx.createGain()
+    noiseGain.gain.setValueAtTime(0.18, ctx.currentTime)
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.025)
+
+    noise.connect(bp)
+    bp.connect(noiseGain)
+    noiseGain.connect(ctx.destination)
+    noise.start()
+    noise.stop(ctx.currentTime + 0.03)
+
+    // Tiny tonal pop underneath
+    const osc = ctx.createOscillator()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(900, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.04)
+
+    const oscGain = ctx.createGain()
+    oscGain.gain.setValueAtTime(0.09, ctx.currentTime)
+    oscGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04)
+
+    osc.connect(oscGain)
+    oscGain.connect(ctx.destination)
+    osc.start()
+    osc.stop(ctx.currentTime + 0.05)
+
+    // Auto-close context after sound finishes
+    setTimeout(() => ctx.close(), 200)
+  } catch {
+    // Silently ignore if Web Audio isn't available
+  }
+}
 
 function SignalVisual() {
   const bars = [18, 28, 12, 35, 22, 40, 15, 30, 8, 38, 20, 25, 42, 10, 32]
@@ -153,21 +216,36 @@ interface PortalCardProps {
   href: string
   accentColor: string
   index: number
+  onCustomClick?: (element: HTMLDivElement | null) => void
+  customNavigation?: boolean
 }
 
-export function PortalCard({ id, number, name, descriptor, href, accentColor, index }: PortalCardProps) {
+export const PortalCard = forwardRef<HTMLDivElement, PortalCardProps>(function PortalCard(
+  { id, number, name, descriptor, href, accentColor, index, onCustomClick, customNavigation },
+  ref
+) {
   const router = useRouter()
   const Visual = visualMap[id]
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (customNavigation && onCustomClick) {
+      onCustomClick(e.currentTarget)
+    } else {
+      router.push(href)
+    }
+  }
 
   return (
     <motion.div
       className="portal-card"
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 + index * 0.1, ease: 'easeOut' }}
-      whileHover={{ scale: 1.025 }}
-      whileTap={{ scale: 0.97 }}
-      onClick={() => router.push(href)}
+      whileHover={{ scale: 1.04, y: -6, transition: { type: 'spring', stiffness: 500, damping: 22, mass: 0.6 } }}
+      whileTap={{ scale: 0.96, y: 0, transition: { type: 'spring', stiffness: 600, damping: 25 } }}
+      onHoverStart={playHoverClick}
+      onClick={handleClick}
       style={{ '--card-accent': accentColor } as React.CSSProperties}
     >
       <div className="portal-visual">
@@ -181,4 +259,4 @@ export function PortalCard({ id, number, name, descriptor, href, accentColor, in
       </div>
     </motion.div>
   )
-}
+})

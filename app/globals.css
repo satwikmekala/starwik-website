@@ -77,35 +77,54 @@ body::after {
 
 /* ── HOME PAGE ── */
 .home-page {
-  height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* centres hero + portals as a single block */
+.home-bg-image {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center 25%;
+  filter: saturate(0.8) contrast(1.05) brightness(0.68);
+}
+
+.home-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 42%, rgba(7, 7, 10, 0.18) 0%, rgba(7, 7, 10, 0.62) 72%, rgba(7, 7, 10, 0.92) 100%),
+    linear-gradient(to bottom, rgba(7, 7, 10, 0.5) 0%, rgba(7, 7, 10, 0.2) 45%, rgba(7, 7, 10, 0.82) 100%);
+}
+
 .home-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 1.5rem;
-  gap: 0.5rem;
-  position: relative;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: 0 1rem clamp(3rem, 10svh, 8rem);
   z-index: 2;
-  overflow: hidden;
 }
+
 .home-nav {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 1.5rem 0;
-  position: relative;
   z-index: 2;
 }
 
 .site-id {
+  display: flex;
+  align-items: center;
   font-size: 0.6rem;
   letter-spacing: 0.25em;
   color: var(--text-muted);
@@ -119,18 +138,21 @@ body::after {
 
 .hero-section {
   text-align: center;
-  padding: 0 1.5rem 0.6rem;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hero-name {
+  display: flex;
+  justify-content: center;
   font-family: var(--font-display), serif;
   font-size: clamp(3.5rem, 14vw, 6rem);
   font-weight: 300;
   letter-spacing: 0.12em;
   color: var(--text-primary);
-  line-height: 1;
-  margin-bottom: 0;
+  line-height: 0;
 }
 
 .hero-logo-svg {
@@ -148,13 +170,12 @@ body::after {
   color: var(--text-muted);
   text-transform: lowercase;
   line-height: 1.6;
-  margin-bottom: 0.15rem;
 }
 
 .hero-sub--question {
   color: var(--text-secondary);
   opacity: 0.6;
-  margin-bottom: 0.75rem;
+  margin-top: 0.15rem;
 }
 
 .hero-rule {
@@ -167,17 +188,15 @@ body::after {
 /* ── PORTAL GRID ── */
 .portals-section {
   width: 100%;
-  padding: 0;
-  position: relative;
+  max-width: 600px;
   z-index: 2;
 }
 
 .portals-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1.5vw, 0.75rem);
   width: 100%;
-  max-width: 860px;
   margin: 0 auto;
 }
 
@@ -188,7 +207,7 @@ body::after {
   cursor: pointer;
   border: 1px solid var(--border-subtle);
   position: relative;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.12s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -197,7 +216,7 @@ body::after {
 }
 
 .portal-visual {
-  height: clamp(160px, 22vh, 220px);
+  height: clamp(56px, 10svh, 160px);
   position: relative;
   overflow: hidden;
 }
@@ -248,13 +267,13 @@ body::after {
 
 /* ── HOME FOOTER ── */
 .home-footer {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   padding: 1.5rem 1.5rem 0;
   font-size: 0.55rem;
   letter-spacing: 0.2em;
   color: var(--text-muted);
-  position: relative;
   z-index: 2;
 }
 
@@ -520,16 +539,17 @@ body::after {
 }
 
 /* ── RESPONSIVE ── */
-@media (min-width: 640px) {
-  .portals-grid {
-    gap: 0.75rem;
+@media (min-width: 1024px) {
+  .portals-section {
+    max-width: 960px;
   }
-}
 
-@media (max-width: 500px) {
   .portals-grid {
-    grid-template-columns: 1fr 1fr;
-    max-width: 400px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .portal-visual {
+    height: clamp(160px, 22svh, 220px);
   }
 }
 

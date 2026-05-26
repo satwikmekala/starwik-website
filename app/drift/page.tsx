@@ -1,85 +1,141 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '★wik — The Drift',
-  description: '8 countries. Counting.',
+  title: '★wik — Elsewhere',
+  description: 'Coming soon.',
 }
 
-const countries = [
-  { code: 'IN', name: 'India', note: 'Where it starts. Always comes back to.' },
-  { code: 'NL', name: 'Netherlands', note: 'Amsterdam. Something cracked open here.' },
-  { code: 'DE', name: 'Germany', note: 'Berlin. Music as philosophy.' },
-  { code: 'CZ', name: 'Czech Republic', note: 'Prague. Old and strange and beautiful.' },
-  { code: 'ES', name: 'Spain', note: 'Mallorca → Barcelona. Sun and clarity.' },
-  { code: 'ID', name: 'Indonesia', note: 'Bali, Gili. The magic was inside you all along.' },
-  { code: 'PH', name: 'Philippines', note: 'Ocean. Presence.' },
-  { code: 'AU', name: 'Australia', note: 'Noosa, Sydney. Returned different.' },
-]
-
-export default function DriftPage() {
+export default function ElsewherePage() {
   return (
-    <main className="universe-page drift-page" style={{ background: 'var(--drift-bg)', minHeight: '100vh' }}>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
 
-      <div className="drift-orbit-bg">
-        <svg viewBox="0 0 600 600" style={{ width: '100%', maxWidth: 600, opacity: 1 }}>
-          <ellipse cx="300" cy="300" rx="280" ry="100" fill="none" stroke="#B07820" strokeWidth="0.5" />
-          <ellipse cx="300" cy="300" rx="200" ry="70" fill="none" stroke="#B07820" strokeWidth="0.3" strokeDasharray="4 6" />
-          <ellipse cx="300" cy="300" rx="120" ry="42" fill="none" stroke="#B07820" strokeWidth="0.3" />
-          <circle cx="300" cy="300" r="8" fill="#6A4410" />
-        </svg>
-      </div>
+        .uc-page {
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #0a0a0a;
+          font-family: 'Space Grotesk', sans-serif;
+          color: #fff;
+          text-align: center;
+          padding: 2rem;
+          position: relative;
+          overflow: hidden;
+        }
 
-      <Link href="/" className="universe-back">← BACK TO ORBIT</Link>
+        .uc-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(120px);
+          opacity: 0.15;
+          pointer-events: none;
+        }
 
-      <div className="universe-hero" style={{ position: 'relative', zIndex: 2 }}>
-        <span className="universe-number" style={{ color: 'var(--drift)' }}>02 / THE DRIFT</span>
-        <h1 className="universe-title">Every place<br />changed the<br />frequency.</h1>
+        .uc-orb-1 {
+          width: 500px;
+          height: 500px;
+          background: #B07820;
+          top: -100px;
+          right: -100px;
+        }
 
-        <p style={{
-          fontSize: '0.7rem', lineHeight: 1.9, color: 'var(--text-secondary)',
-          maxWidth: 360, marginTop: '1.5rem', letterSpacing: '0.03em',
-        }}>
-          8 countries in 12 months. Not tourism — 
-          field research into becoming.
-        </p>
+        .uc-orb-2 {
+          width: 350px;
+          height: 350px;
+          background: #4858C8;
+          bottom: -80px;
+          left: -80px;
+        }
 
-        <div style={{ marginTop: '3rem', maxWidth: 420 }}>
-          <div style={{
-            fontSize: '0.5rem', letterSpacing: '0.25em',
-            color: 'rgba(176,120,32,0.4)', marginBottom: '1.25rem',
-          }}>
-            THE NODES
-          </div>
-          {countries.map((c, i) => (
-            <div key={c.code} style={{
-              display: 'grid', gridTemplateColumns: '36px 1fr',
-              gap: '1rem', alignItems: 'start',
-              padding: '0.85rem 0',
-              borderBottom: '1px solid rgba(176,120,32,0.08)',
-            }}>
-              <span style={{
-                fontSize: '0.5rem', color: 'var(--drift)',
-                opacity: 0.5, letterSpacing: '0.1em', paddingTop: '0.15rem',
-              }}>
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
-                  {c.name}
-                </div>
-                <div style={{ fontSize: '0.55rem', color: 'var(--text-muted)', marginTop: '0.2rem', lineHeight: 1.6, letterSpacing: '0.04em' }}>
-                  {c.note}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        .uc-label {
+          font-size: 0.65rem;
+          font-weight: 500;
+          letter-spacing: 0.25em;
+          color: #B07820;
+          text-transform: uppercase;
+          margin-bottom: 2rem;
+          opacity: 0.9;
+        }
 
-        <p className="universe-status" style={{ marginTop: '3rem', color: 'rgba(176,120,32,0.35)' }}>
-          FULL MAP + VLOGS — LOADING ◎
-        </p>
-      </div>
-    </main>
+        .uc-icon {
+          font-size: 3rem;
+          margin-bottom: 1.5rem;
+          display: block;
+          animation: uc-float 4s ease-in-out infinite;
+        }
+
+        @keyframes uc-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        .uc-title {
+          font-size: clamp(2.5rem, 8vw, 5rem);
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1;
+          margin: 0 0 1.5rem;
+          background: linear-gradient(135deg, #fff 0%, #888 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .uc-sub {
+          font-size: 1rem;
+          font-weight: 300;
+          color: #666;
+          letter-spacing: 0.05em;
+          margin: 0 0 3rem;
+          max-width: 380px;
+          line-height: 1.7;
+        }
+
+        .uc-back {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #fff;
+          text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.15);
+          padding: 0.8rem 1.6rem;
+          border-radius: 100px;
+          transition: all 0.3s ease;
+        }
+
+        .uc-back:hover {
+          border-color: #B07820;
+          color: #B07820;
+          background: rgba(176, 120, 32, 0.08);
+        }
+
+        .uc-divider {
+          width: 40px;
+          height: 1px;
+          background: rgba(255,255,255,0.15);
+          margin: 0 auto 2rem;
+        }
+      `}</style>
+
+      <main className="uc-page">
+        <div className="uc-orb uc-orb-1" aria-hidden="true" />
+        <div className="uc-orb uc-orb-2" aria-hidden="true" />
+
+        <span className="uc-label">02 — Elsewhere</span>
+        <span className="uc-icon" aria-hidden="true">✦</span>
+        <h1 className="uc-title">Under Construction.</h1>
+        <div className="uc-divider" />
+        <p className="uc-sub">This world is still being mapped. Check back soon.</p>
+        <Link href="/" className="uc-back">← Back to wikverse</Link>
+      </main>
+    </>
   )
 }

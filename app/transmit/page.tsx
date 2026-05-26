@@ -1,101 +1,141 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '★wik — The Transmit',
-  description: 'Words. Ideas. Confessions.',
+  title: '★wik — Thoughts',
+  description: 'Coming soon.',
 }
 
-const posts = [
-  {
-    title: 'The Thought You Almost Lost',
-    excerpt: 'What happens in the three seconds between the idea and the forgotten.',
-    tag: 'MIND',
-  },
-  {
-    title: 'On Becoming',
-    excerpt: 'Europe cracked something open. I went in one person and returned as a question.',
-    tag: 'JOURNEY',
-  },
-]
-
-export default function TransmitPage() {
+export default function ThoughtsPage() {
   return (
-    <main className="universe-page transmit-page" style={{ background: 'var(--transmit-bg)', minHeight: '100vh' }}>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap');
 
-      <div className="transmit-static-bg" aria-hidden>
-        {'wordthoughtideapulsefeelingrawmindtruthvoice'.split('').join('')}
-      </div>
+        .uc-page {
+          min-height: 100dvh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #0a0a0a;
+          font-family: 'Space Grotesk', sans-serif;
+          color: #fff;
+          text-align: center;
+          padding: 2rem;
+          position: relative;
+          overflow: hidden;
+        }
 
-      <Link href="/" className="universe-back">← BACK TO ORBIT</Link>
+        .uc-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(120px);
+          opacity: 0.15;
+          pointer-events: none;
+        }
 
-      <div className="universe-hero" style={{ position: 'relative', zIndex: 2 }}>
-        <span className="universe-number" style={{ color: 'var(--transmit)' }}>03 / THE TRANSMIT</span>
-        <h1 className="universe-title">Some things<br />need to be<br />said out loud.</h1>
+        .uc-orb-1 {
+          width: 500px;
+          height: 500px;
+          background: #4858C8;
+          top: -100px;
+          right: -100px;
+        }
 
-        <p style={{
-          fontSize: '0.7rem', lineHeight: 1.9, color: 'var(--text-secondary)',
-          maxWidth: 360, marginTop: '1.5rem', letterSpacing: '0.03em',
-        }}>
-          Writings from the edge of things I&apos;m figuring out.
-          Raw and probably unfinished.
-        </p>
+        .uc-orb-2 {
+          width: 350px;
+          height: 350px;
+          background: #7B3FA0;
+          bottom: -80px;
+          left: -80px;
+        }
 
-        <div style={{ marginTop: '3rem', maxWidth: 420 }}>
-          <div style={{
-            fontSize: '0.5rem', letterSpacing: '0.25em',
-            color: 'rgba(72,88,200,0.4)', marginBottom: '1.25rem',
-          }}>
-            TRANSMISSIONS
-          </div>
-          {posts.map((post, i) => (
-            <div key={i} style={{
-              padding: '1.2rem 0',
-              borderBottom: '1px solid rgba(72,88,200,0.1)',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                <h3 style={{
-                  fontFamily: 'var(--font-display), serif',
-                  fontSize: '1rem', fontWeight: 400,
-                  color: 'var(--text-primary)', letterSpacing: '0.04em',
-                  lineHeight: 1.3,
-                }}>
-                  {post.title}
-                </h3>
-                <span style={{
-                  fontSize: '0.45rem', color: 'var(--transmit)',
-                  letterSpacing: '0.15em', opacity: 0.6,
-                  marginLeft: '1rem', paddingTop: '0.15rem', whiteSpace: 'nowrap',
-                }}>
-                  {post.tag}
-                </span>
-              </div>
-              <p style={{ fontSize: '0.6rem', color: 'var(--text-muted)', lineHeight: 1.7, letterSpacing: '0.03em' }}>
-                {post.excerpt}
-              </p>
-            </div>
-          ))}
-        </div>
+        .uc-label {
+          font-size: 0.65rem;
+          font-weight: 500;
+          letter-spacing: 0.25em;
+          color: #4858C8;
+          text-transform: uppercase;
+          margin-bottom: 2rem;
+          opacity: 0.9;
+        }
 
-        <a
-          href="https://substack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-block', marginTop: '2.5rem',
-            fontSize: '0.6rem', letterSpacing: '0.2em',
-            color: 'var(--transmit)', textDecoration: 'none',
-            borderBottom: '1px solid rgba(72,88,200,0.3)',
-            paddingBottom: '0.2rem',
-          }}
-        >
-          READ ON SUBSTACK →
-        </a>
+        .uc-icon {
+          font-size: 3rem;
+          margin-bottom: 1.5rem;
+          display: block;
+          animation: uc-float 4s ease-in-out infinite;
+        }
 
-        <p className="universe-status" style={{ marginTop: '3rem', color: 'rgba(72,88,200,0.35)' }}>
-          MORE TRANSMISSIONS INCOMING ◈
-        </p>
-      </div>
-    </main>
+        @keyframes uc-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        .uc-title {
+          font-size: clamp(2.5rem, 8vw, 5rem);
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1;
+          margin: 0 0 1.5rem;
+          background: linear-gradient(135deg, #fff 0%, #888 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .uc-sub {
+          font-size: 1rem;
+          font-weight: 300;
+          color: #666;
+          letter-spacing: 0.05em;
+          margin: 0 0 3rem;
+          max-width: 380px;
+          line-height: 1.7;
+        }
+
+        .uc-back {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #fff;
+          text-decoration: none;
+          border: 1px solid rgba(255,255,255,0.15);
+          padding: 0.8rem 1.6rem;
+          border-radius: 100px;
+          transition: all 0.3s ease;
+        }
+
+        .uc-back:hover {
+          border-color: #4858C8;
+          color: #4858C8;
+          background: rgba(72, 88, 200, 0.08);
+        }
+
+        .uc-divider {
+          width: 40px;
+          height: 1px;
+          background: rgba(255,255,255,0.15);
+          margin: 0 auto 2rem;
+        }
+      `}</style>
+
+      <main className="uc-page">
+        <div className="uc-orb uc-orb-1" aria-hidden="true" />
+        <div className="uc-orb uc-orb-2" aria-hidden="true" />
+
+        <span className="uc-label">03 — Thoughts</span>
+        <span className="uc-icon" aria-hidden="true">✦</span>
+        <h1 className="uc-title">Under Construction.</h1>
+        <div className="uc-divider" />
+        <p className="uc-sub">Thoughts are forming. Come back when they&apos;re ready.</p>
+        <Link href="/" className="uc-back">← Back to wikverse</Link>
+      </main>
+    </>
   )
 }
