@@ -88,6 +88,12 @@ const allGigs = [
 
 const mixes = [
   {
+    videoId: 'MtOWuSFrr9o',
+    title: '★wik — Vol. 04',
+    meta: 'YOUTUBE · 2026',
+    desc: "Avi had this idea back in January. We finally made it happen months later with zero production, two cameras where one didn't even record, and issue after issue mid-set. We figured it out anyway. Ended up driving all the way to the airport on the ORR with no real plan. Sometimes the unplanned ones hit the hardest.",
+  },
+  {
     videoId: '9kuPPDcWT44',
     title: '★wik — Mix Vol. 3',
     meta: 'YOUTUBE · 2026',
@@ -100,6 +106,22 @@ const mixes = [
     desc: 'Early days. I set up whatever I had on my terrace and just hit record. No studio, no setup, just music that felt like an honest expression of where I was at that point in the journey. Raw and real.',
   },
 ]
+
+const latestRelease = {
+  eyebrow: 'LATEST RELEASE',
+  title: 'Too Bouncy To Be Careless',
+  meta: 'SOUNDCLOUD · 2025 · 36:15',
+  tags: ['BASS HOUSE', 'TECH HOUSE', 'BOUNCY', '123–130 BPM', 'DANCE'],
+  desc: "This genre has been driving my daily lifestyle lately. It's in the way I move, the way I think, the way I show up. Too Bouncy To Be Careless is me bringing a part of that to you. Play it while you train. Play it while you run. Play it through your work hours. Play it in your room in the evening when you just want to unwind and dance a little. Let's connect through music. Let me curate an experience for you.",
+  cover: '/images/soundcloud.jpg',
+  // color param retuned from amber to the page's crimson (--warm #c0192b) so the
+  // player's waveform reads in-palette with everything around it.
+  // show_artwork=false drops the player's redundant thumbnail (we already show the
+  // cover on the left) and, crucially, removes the one element that would look wrong
+  // when the iframe is inverted to match the dark page — see .releaseEmbed in the CSS.
+  embedSrc:
+    'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fsatwik-mekala%2Ftoo-bouncy-to-be-careless&color=%23c0192b&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&show_artwork=false',
+}
 
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(' ')
@@ -325,6 +347,49 @@ export default function FrequenciesPage() {
         <h2 className={fade('d1', styles.mixesHeading)} data-frequency-fade>
           Recorded Sets.
         </h2>
+
+        <div className={fade('d2', styles.release)} data-frequency-fade>
+          <div className={styles.releaseCover}>
+            <Image
+              src={latestRelease.cover}
+              alt={`${latestRelease.title} — cover art`}
+              fill
+              sizes="(min-width: 1024px) 300px, (min-width: 640px) 200px, 340px"
+              className={styles.releaseCoverImg}
+            />
+          </div>
+
+          <div className={styles.releaseInfo}>
+            <span className={styles.releaseEyebrow}>
+              <span className={styles.releaseDot} aria-hidden="true" />
+              {latestRelease.eyebrow}
+            </span>
+            <h3 className={styles.releaseTitle}>{latestRelease.title}</h3>
+            <p className={styles.releaseMeta}>{latestRelease.meta}</p>
+            <div className={styles.releaseTags}>
+              {latestRelease.tags.map((tag) => (
+                <span key={tag} className={styles.releaseTag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <p className={styles.releaseDesc}>{latestRelease.desc}</p>
+          </div>
+
+          <div className={styles.releasePlayer}>
+            <iframe
+              className={styles.releaseEmbed}
+              title={`${latestRelease.title} — SoundCloud player`}
+              src={latestRelease.embedSrc}
+              allow="autoplay"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <span className={fade('d3', styles.mixesSubLabel)} data-frequency-fade>
+          YouTube mixes
+        </span>
         <div className={styles.mixesGrid}>
           {mixes.map((mix, index) => (
             <article

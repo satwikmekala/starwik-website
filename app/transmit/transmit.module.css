@@ -1,0 +1,546 @@
+/* ── TRANSMIT — a transmission log ─────────────────────────────
+   One axis of movement. It goes right.
+
+   Color is an opacity system, not a palette:
+   base #EDE8E0 on #090807 at .92 / .45 / .22 / .08.
+   Amber #C45A18 only for entry numbers, the LAST TRANSMISSION
+   line, and the progress fill. Space Mono only for metadata.
+   Cormorant only for essay titles and pull quotes.
+   Everything else is the system stack — native type, zero shift.
+──────────────────────────────────────────────────────────────── */
+
+.page {
+  --amber: #C45A18;
+  --sys: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue',
+    Arial, sans-serif;
+  --t-primary: rgba(237, 232, 224, 0.92);
+  --t-secondary: rgba(237, 232, 224, 0.45);
+  --t-muted: rgba(237, 232, 224, 0.22);
+  --t-ghost: rgba(237, 232, 224, 0.08);
+
+  background: #090807;
+  color: var(--t-primary);
+  font-family: var(--sys);
+  min-height: 100svh;
+}
+
+/* the room is not flat — one barely-there pool of warmth */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 45%,
+    #0d0a08 0%,
+    #060504 100%
+  );
+  pointer-events: none;
+}
+
+/* ── NAVIGATION — fixed top-left, never moves ── */
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.5rem;
+  pointer-events: none;
+}
+
+.backLink {
+  pointer-events: auto;
+  width: fit-content;
+  font-family: var(--sys);
+  font-size: 0.7rem;
+  color: rgba(237, 232, 224, 0.4);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.backLink:hover {
+  color: rgba(237, 232, 224, 0.75);
+}
+
+.navMark {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.45rem;
+  letter-spacing: 0.3em;
+  color: var(--t-muted);
+}
+
+.navDate {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  color: var(--t-muted);
+  margin-top: -0.35rem;
+  animation: navFade 0.5s ease both;
+}
+
+@keyframes navFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── PROGRESS — a 1px line, amber advancing left to right ── */
+
+.progressTrack {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  z-index: 40;
+  background: rgba(237, 232, 224, 0.06);
+}
+
+.progressFill {
+  height: 1px;
+  width: 100%;
+  background: var(--amber);
+  transform-origin: left center;
+}
+
+/* ── STAGGER — content assembles itself as you arrive ──
+   meta 0ms · main content 80ms · sub-content 180ms
+   500ms, cubic-bezier(0.25, 0.1, 0.25, 1) */
+
+.st {
+  opacity: 0;
+}
+
+.arrived .st1 {
+  animation: stFade 500ms cubic-bezier(0.25, 0.1, 0.25, 1) 0ms both;
+}
+
+.arrived .st2 {
+  animation: stRise 500ms cubic-bezier(0.25, 0.1, 0.25, 1) 80ms both;
+}
+
+.arrived .st3 {
+  animation: stRise 500ms cubic-bezier(0.25, 0.1, 0.25, 1) 180ms both;
+}
+
+@keyframes stFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes stRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── METADATA LINE — mono, the one thread through every entry ── */
+
+.metaLine {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.metaNum {
+  color: rgba(196, 90, 24, 0.85);
+}
+
+.metaDate {
+  color: var(--t-muted);
+  margin-left: 1em;
+}
+
+/* ── PHOTO — the image IS the element ── */
+
+.photoWrap {
+  margin: 0;
+}
+
+.photoMedia {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--r);
+}
+
+.photoMetaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2rem;
+  margin-top: 0.9rem;
+}
+
+.photoCaption {
+  font-family: var(--sys);
+  font-size: 0.72rem;
+  color: rgba(237, 232, 224, 0.42);
+  text-align: right;
+  line-height: 1.5;
+}
+
+/* ── THOUGHT — the text is the design, space does the work ── */
+
+.thoughtText {
+  font-family: var(--sys);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--t-primary);
+  max-width: 26em;
+  text-align: left;
+}
+
+.thoughtMeta {
+  display: block;
+  margin-top: 2.2rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(196, 90, 24, 0.3);
+}
+
+/* ── ESSAY — title, opening, one quiet way in ── */
+
+.essayBtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.essayTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: 0.005em;
+  color: var(--t-primary);
+  margin: 1.5rem 0 1.6rem;
+}
+
+.essayOpening {
+  font-family: var(--sys);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: rgba(237, 232, 224, 0.5);
+  max-width: 52ch;
+}
+
+.essayLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 2.1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--amber);
+  opacity: 0.85;
+}
+
+.essayArrow {
+  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@media (hover: hover) {
+  .essayBtn:hover .essayArrow {
+    transform: translateX(5px);
+  }
+}
+
+/* ── MOMENT — photo and words as one unit ── */
+
+.momentWrap {
+  margin: 0;
+}
+
+.momentMedia {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--r);
+}
+
+.momentText {
+  font-family: var(--sys);
+  font-size: 0.85rem;
+  line-height: 1.9;
+  color: rgba(237, 232, 224, 0.6);
+  max-width: 48ch;
+  margin-top: 1.1rem;
+}
+
+.momentMeta {
+  display: block;
+  margin-top: 1.5rem;
+}
+
+/* ── INTRO / END PANELS ── */
+
+.introSignal {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--amber);
+}
+
+.introRule {
+  width: 32px;
+  height: 1px;
+  background: var(--amber);
+  opacity: 0.5;
+  margin-top: 1.1rem;
+}
+
+.introSub {
+  font-family: var(--sys);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--t-secondary);
+  max-width: 24ch;
+  margin-top: 2.2rem;
+}
+
+.introGhost {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-58%);
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(6rem, 12vw, 10.5rem);
+  letter-spacing: 0.08em;
+  color: var(--t-ghost);
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+.endText {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--t-muted);
+}
+
+.endRule {
+  width: 32px;
+  height: 1px;
+  background: rgba(237, 232, 224, 0.22);
+  margin-top: 1.1rem;
+}
+
+/* ── MOBILE < 768px — vertical, native, unhijacked ── */
+
+.vFeed {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(7rem, 18vh, 10rem);
+  padding: 7.5rem 0 7rem;
+}
+
+.vPad {
+  padding-inline: 6%;
+}
+
+/* ── DESKTOP ≥ 768px — the horizontal room ── */
+
+@media (min-width: 768px) {
+  .vPad {
+    padding-inline: 0;
+  }
+}
+
+.hViewport {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hTrack {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  width: max-content;
+  gap: 4vw;
+  padding-left: 6vw;
+  padding-right: 14vw;
+  will-change: transform;
+}
+
+.hPanel {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding-top: 6vh;
+  padding-bottom: 8vh;
+}
+
+/* 75–85vw each; the next one always peeks in 8–12vw */
+.wThought { width: 78vw; }
+.wPhoto { width: 82vw; }
+.wEssay { width: 80vw; }
+.wMoment { width: 80vw; }
+
+.introPanel {
+  width: 44vw;
+  /* the ghost word crops at the frame edge — deliberately */
+  overflow: hidden;
+}
+.endPanel { width: 36vw; }
+
+/* images breathe inside the viewport, never overflow it */
+.hTrack .photoMedia {
+  width: min(100%, calc(74vh * var(--rv, 1.333)));
+}
+
+.hTrack .momentMedia {
+  aspect-ratio: auto;
+  width: min(100%, 44vw);
+  height: 56vh;
+}
+
+.hTrack .momentText,
+.hTrack .momentMeta {
+  max-width: min(48ch, 44vw);
+}
+
+/* ── READER — just words and space ── */
+
+.reader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #090807;
+  display: flex;
+  flex-direction: column;
+}
+
+.readerBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 120% 90% at 50% 40%,
+    #0d0a08 0%,
+    #060504 100%
+  );
+  pointer-events: none;
+}
+
+.readerClose {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.6rem;
+  z-index: 2;
+  padding: 0.6rem;
+  border: none;
+  background: none;
+  font-family: var(--sys);
+  font-size: 0.8rem;
+  color: rgba(237, 232, 224, 0.4);
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.readerClose:hover {
+  color: rgba(237, 232, 224, 0.8);
+}
+
+.readerScroll {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 12vh 6% 16vh;
+}
+
+.readerInner {
+  max-width: 56ch;
+  margin-inline: auto;
+}
+
+.readerMeta {
+  margin-bottom: 1.8rem;
+}
+
+.readerTitle {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.12;
+  color: var(--t-primary);
+  margin-bottom: 3.2rem;
+}
+
+.readerBody {
+  font-family: var(--sys);
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: rgba(237, 232, 224, 0.85);
+}
+
+.readerBody + .readerBody {
+  margin-top: 1.6em;
+}
+
+.pullQuote {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  line-height: 1.5;
+  color: var(--t-primary);
+  margin: 3rem 0;
+}
+
+.readerEnd {
+  margin-top: 4.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  color: var(--t-muted);
+}
+
+@media (min-width: 768px) {
+  .readerScroll {
+    padding: 14vh 10% 18vh;
+  }
+}
+
+/* ── REDUCED MOTION ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .st {
+    opacity: 1;
+  }
+
+  .arrived .st1,
+  .arrived .st2,
+  .arrived .st3 {
+    animation: none;
+  }
+
+  .navDate {
+    animation: none;
+  }
+
+  .essayArrow {
+    transition: none;
+  }
+}
