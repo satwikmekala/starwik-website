@@ -166,6 +166,18 @@
   color: var(--warm);
 }
 
+.navActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* keep the footer clear of the listening dock once a record is on */
+:global(html[data-listening-dock]) .page {
+  padding-bottom: 6rem;
+}
+
 .navBook {
   padding: 0.5rem 1rem;
   border: 1px solid var(--border-warm);
@@ -221,6 +233,12 @@
 }
 
 .heroContent {
+  --hero-logo-w: clamp(14rem, 34vw, 21.5rem);
+  /* the artwork sits inset ~10.9% from the left of the logo's viewBox and spans
+     ~75.6% of its width — derive the visual box so the rule and meta row below
+     can share the logo's exact left and right edges */
+  --hero-logo-inset: calc(var(--hero-logo-w) * 0.1086);
+  --hero-logo-vis: calc(var(--hero-logo-w) * 0.7555);
   position: relative;
   z-index: 2;
   padding: 0 1.5rem;
@@ -236,45 +254,81 @@
 
 .heroName {
   display: block;
-  width: clamp(13rem, 52vw, 27rem);
-  height: clamp(6.8rem, 27vw, 14rem);
-  overflow: hidden;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.45rem calc(var(--hero-logo-inset) * -1);
   line-height: 1;
 }
 
 .heroNameLogo {
   display: block;
-  width: 100%;
+  width: var(--hero-logo-w);
   height: auto;
-  max-width: none;
-  transform: translate(-10%, -23%);
+}
+
+.heroMeta {
+  display: flex;
+  width: var(--hero-logo-vis);
+  min-width: max-content;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5em;
+  /* trailing letter-spacing would hold the last glyph off the logo's right edge */
+  margin: 0.35rem -0.26em 2.05rem 0;
+  font-size: clamp(0.5rem, 1.2vw, 0.58rem);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .heroRole {
-  margin: -0.7rem 0 1.2rem clamp(1.06rem, 4.24vw, 2.2rem);
   color: var(--text-sec);
-  font-size: 0.52rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  transform: translateY(-0.25rem);
 }
 
-.heroTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-left: clamp(1.06rem, 4.24vw, 2.2rem);
-  margin-bottom: 2.05rem;
+.heroNowPlaying {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(240, 235, 227, 0.5);
 }
 
-.heroTag {
-  padding: 0.28rem 0.6rem;
-  border: 1px solid rgba(240, 235, 227, 0.1);
-  border-radius: 100px;
-  color: var(--text-muted);
-  font-size: 0.42rem;
-  letter-spacing: 0.14em;
+/* From tablet up the logo is large enough for the meta block to sit on the
+   wordmark's own measured span: the "w" starts at 25.1% and the "k" ends at
+   86.41% of the logo box, so the role line fills exactly that width and
+   "mixing house" centres inside it. */
+@media (min-width: 768px) {
+  .heroMeta {
+    width: calc(var(--hero-logo-w) * 0.6131);
+    min-width: 0;
+    align-items: center;
+    margin: 0.4rem 0 2.05rem calc(var(--hero-logo-w) * 0.1424);
+    font-size: calc(var(--hero-logo-w) * 0.0397);
+  }
+
+  .heroRole,
+  .heroNowPlaying {
+    /* trim each line's trailing letter-space so glyphs define the edges */
+    margin-right: -0.26em;
+  }
+}
+
+.heroMetaDot {
+  width: 0.42em;
+  height: 0.42em;
+  flex: none;
+  margin-right: 0.85em;
+  border-radius: 50%;
+  background: var(--warm);
+  animation: heroNowPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroNowPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    box-shadow: 0 0 0 0 rgba(192, 25, 43, 0);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 8px 1px rgba(192, 25, 43, 0.45);
+  }
 }
 
 .heroWave {
@@ -730,6 +784,18 @@
   filter: brightness(1);
 }
 
+.gigPhotoAntisocial {
+  background: radial-gradient(ellipse 70% 60% at 45% 45%, #4a0a1e 0%, #1a0612 60%, #0c0508 100%);
+}
+
+.gigPhotoExtClubroom {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, #400a1a 0%, #190611 60%, #0b0508 100%);
+}
+
+.gigPhotoKrunklive {
+  background: radial-gradient(ellipse 70% 60% at 55% 50%, #32081a 0%, #17060f 60%, #0a0408 100%);
+}
+
 .gigPhotoMoonshine {
   background: radial-gradient(ellipse 70% 60% at 40% 50%, #5a0a18 0%, #1a0610 60%, #0e0508 100%);
 }
@@ -856,15 +922,38 @@
   line-height: 1;
 }
 
+.mixesSubLabel {
+  display: block;
+  margin-bottom: 1.25rem;
+  color: var(--warm);
+  font-size: 0.56rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
 .mixesGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.85rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-top: 8px;
+  margin-top: -8px;
+  padding-bottom: 1rem;
+}
+
+.mixesGrid::-webkit-scrollbar {
+  display: none;
 }
 
 .mixCard {
   position: relative;
   z-index: 1;
+  flex: 0 0 82vw;
+  max-width: 340px;
+  scroll-snap-align: start;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -953,6 +1042,215 @@
   font-size: 0.6rem;
   letter-spacing: 0.02em;
   line-height: 1.8;
+}
+
+/* ── LATEST RELEASE (inside the mixes section) ───────────────── */
+
+.release {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2.75rem;
+  /* Subtle rule separating the freshest drop from the recorded-sets grid below */
+  border-bottom: 1px solid var(--border);
+}
+
+.releaseCover {
+  position: relative;
+  width: 100%;
+  max-width: 340px; /* keep the square from dominating on mobile */
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #0f0709;
+}
+
+.releaseCoverImg {
+  object-fit: cover;
+  object-position: center;
+}
+
+.releaseInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.releaseEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  color: var(--warm);
+  font-size: 0.44rem;
+  letter-spacing: 0.28em;
+  opacity: 0.85;
+}
+
+.releaseDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--warm);
+  box-shadow: 0 0 8px rgba(192, 25, 43, 0.85);
+  animation: releasePulse 1.8s ease-in-out infinite;
+}
+
+@keyframes releasePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.releaseTitle {
+  color: var(--text);
+  font-family: var(--display);
+  font-size: clamp(1.7rem, 6vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.releaseMeta {
+  margin-top: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.44rem;
+  letter-spacing: 0.12em;
+}
+
+.releaseTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+.releaseTag {
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  color: var(--text-muted);
+  font-size: 0.38rem;
+  letter-spacing: 0.12em;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.releaseTag:hover {
+  border-color: rgba(192, 25, 43, 0.85);
+  color: rgba(192, 25, 43, 0.75);
+}
+
+.releaseDesc {
+  margin-top: 1.1rem;
+  max-width: 58ch;
+  color: var(--text-sec);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+}
+
+.releasePlayer {
+  /* Mobile spacing comes from the flex gap; desktop grid sets its own margin */
+  margin-top: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-warm);
+  border-radius: 8px;
+  line-height: 0;
+}
+
+.releaseEmbed {
+  display: block;
+  width: 100%;
+  height: 166px;
+  border: none;
+  /* SoundCloud's compact widget only ships light. invert flips its white background
+     to near-black; hue-rotate keeps the crimson waveform/play button roughly true;
+     sepia + saturate warm the neutral dark toward the page's warm-black (#0f0709)
+     cards so the player reads as part of the theme. Tune sepia up for more warmth. */
+  filter: invert(1) hue-rotate(180deg) sepia(0.32) saturate(1.35);
+}
+
+@media (min-width: 640px) {
+  /* Cover sits left, info fills the remaining space, the player spans the full
+     width beneath both. The block is capped and left-anchored (aligned with the
+     heading) so it reads as one tight feature unit rather than stretching across
+     the whole canvas. minmax(0, 1fr) stops the info column from overflowing. */
+  .release {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    column-gap: 2rem;
+    row-gap: 0;
+    align-items: start;
+    max-width: 900px;
+  }
+
+  .releaseCover {
+    max-width: none;
+  }
+
+  .releasePlayer {
+    grid-column: 1 / -1;
+    margin-top: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .release {
+    grid-template-columns: 300px minmax(0, 1fr);
+    column-gap: 3rem;
+    max-width: 1040px;
+  }
+
+  .releasePlayer {
+    margin-top: 2rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .release {
+    grid-template-columns: 340px minmax(0, 1fr);
+    column-gap: 3.5rem;
+    max-width: 1180px;
+    margin-bottom: 3.5rem;
+    padding-bottom: 3.25rem;
+  }
+
+  .releaseEyebrow {
+    font-size: 0.56rem;
+  }
+
+  .releaseTitle {
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+  }
+
+  .releaseMeta {
+    font-size: 0.54rem;
+  }
+
+  .releaseTag {
+    font-size: 0.46rem;
+    padding: 0.26rem 0.62rem;
+  }
+
+  .releaseDesc {
+    font-size: 0.72rem;
+    line-height: 1.9;
+    max-width: 62ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .releaseDot {
+    animation: none;
+  }
 }
 
 .book {
@@ -1058,7 +1356,15 @@
   }
 
   .mixesGrid {
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: unset;
+    padding-bottom: 0;
+  }
+
+  .mixCard {
+    flex: unset;
+    max-width: unset;
   }
 }
 
@@ -1155,14 +1461,6 @@
 
   .heroEyebrow {
     font-size: 0.58rem;
-  }
-
-  .heroRole {
-    font-size: 0.64rem;
-  }
-
-  .heroTag {
-    font-size: 0.52rem;
   }
 
   .sectionLabel {

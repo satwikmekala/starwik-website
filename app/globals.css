@@ -538,6 +538,27 @@ body::after {
   overflow: hidden;
 }
 
+/* ── THOUGHTS — document behaviour while the room is open ──
+   (set by app/thoughts/_components/ThoughtsExperience.tsx) */
+html[data-thoughts='archive'],
+html[data-thoughts='portal'],
+html[data-thoughts='missing'] {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* the page is paper — so is anything an overscroll reveals */
+html[data-thoughts='read'],
+html[data-thoughts='read'] body {
+  background: #ebe4d6;
+}
+
+/* a calmer, still grain for reading */
+html[data-thoughts='read'] body::after {
+  opacity: 0.035;
+  animation: none;
+}
+
 /* ── RESPONSIVE ── */
 @media (min-width: 1024px) {
   .portals-section {

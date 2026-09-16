@@ -7,6 +7,8 @@ import {
   DJWaveform,
   YouTubeThumbnail,
 } from './FrequenciesClient'
+import { WikLogo } from '@/components/WikLogo'
+import { ListenButton } from '@/components/listening/ListenButton'
 import styles from './frequencies.module.css'
 
 export const metadata: Metadata = {
@@ -14,19 +16,48 @@ export const metadata: Metadata = {
   description: 'DJ press kit for ★wik: sets, mixes, live history, and booking.',
 }
 
-const heroTags = ['HOUSE', 'TECHNO', 'REMIXES']
 
 const artistGenres = [
-  'DEEP HOUSE',
-  'TECH HOUSE',
-  'MELODIC HOUSE',
-  'AFRO HOUSE',
+  'DEEP',
+  'TECH',
+  'MINIMAL',
+  'ACID',
+  'MELODIC',
+  'AFRO',
   'VAPOURSOUL',
-  'PROGRESSIVE TECHNO',
+  'PROGRESSIVE',
+  'BASS',
   'REMIXES'
 ]
 
 const allGigs = [
+  {
+    venue: 'ANTI-SOCIAL',
+    event: 'WHATPARTY004',
+    location: 'HYD · 2026',
+    desc: 'Playing Progressive House always puts me in a flow state — lost completely in the tracks I was spinning. Beyond grateful to open for Praveen Achari, a legend in India\'s progressive house scene. The production was top notch, the sound was top notch, and the vibe we curated together was top notch, indeed.',
+    tags: ['PROGRESSIVE HOUSE'],
+    photoClass: styles.gigPhotoAntisocial,
+    image: '/images/antisocial.jpg',
+  },
+  {
+    venue: 'KRUNKLIVE @KATHACRAFTHOUSE',
+    event: 'CLUB NIGHT',
+    location: 'HYD · 2026',
+    desc: 'Opened for MA-SHA, an international artist from New York touring India with Hotbox. Given full freedom to showcase my sound, I spun up house music with rolling basslines and bouncy energy — the whole set captured live on YouTube.',
+    tags: ['MINIMAL', 'DEEP TECH', 'GROOVY HOUSE EDITS'],
+    photoClass: styles.gigPhotoKrunklive,
+    image: '/images/krunklive.jpg',
+  },
+  {
+    venue: 'EXT CLUBROOM',
+    event: 'CLUB NIGHT',
+    location: 'HYD · 2026',
+    desc: "This was the most high-energy set I've ever played. EXT Clubroom is iconic, and on a Wednesday night we packed the room out — the energy was so high, the vibes were so high, that we all just got lost in the dancing. Hands down one of my best sets.",
+    tags: ['SPEED HOUSE', 'HARD HOUSE', 'TRANCE HOUSE'],
+    photoClass: styles.gigPhotoExtClubroom,
+    image: '/images/ext-clubroom.jpg',
+  },
   {
     venue: 'EXT MOONSHINE',
     event: 'WHAT PARTY',
@@ -88,6 +119,12 @@ const allGigs = [
 
 const mixes = [
   {
+    videoId: 'MtOWuSFrr9o',
+    title: '★wik — Vol. 04',
+    meta: 'YOUTUBE · 2026',
+    desc: "Avi had this idea back in January. We finally made it happen months later with zero production, two cameras where one didn't even record, and issue after issue mid-set. We figured it out anyway. Ended up driving all the way to the airport on the ORR with no real plan. Sometimes the unplanned ones hit the hardest.",
+  },
+  {
     videoId: '9kuPPDcWT44',
     title: '★wik — Mix Vol. 3',
     meta: 'YOUTUBE · 2026',
@@ -101,6 +138,22 @@ const mixes = [
   },
 ]
 
+const latestRelease = {
+  eyebrow: 'LATEST RELEASE',
+  title: 'Too Bouncy To Be Careless',
+  meta: 'SOUNDCLOUD · 2025 · 36:15',
+  tags: ['BASS HOUSE', 'TECH HOUSE', 'BOUNCY', '123–130 BPM', 'DANCE'],
+  desc: "This genre has been driving my daily lifestyle lately. It's in the way I move, the way I think, the way I show up. Too Bouncy To Be Careless is me bringing a part of that to you. Play it while you train. Play it while you run. Play it through your work hours. Play it in your room in the evening when you just want to unwind and dance a little. Let's connect through music. Let me curate an experience for you.",
+  cover: '/images/soundcloud.jpg',
+  // color param retuned from amber to the page's crimson (--warm #c0192b) so the
+  // player's waveform reads in-palette with everything around it.
+  // show_artwork=false drops the player's redundant thumbnail (we already show the
+  // cover on the left) and, crucially, removes the one element that would look wrong
+  // when the iframe is inverted to match the dark page — see .releaseEmbed in the CSS.
+  embedSrc:
+    'https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fsatwik-mekala%2Ftoo-bouncy-to-be-careless&color=%23c0192b&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&show_artwork=false',
+}
+
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
@@ -108,8 +161,6 @@ function cx(...classes: Array<string | false | undefined>) {
 function fade(delay?: 'd1' | 'd2' | 'd3' | 'd4', extra?: string) {
   return cx(styles.fade, delay && styles[delay], extra)
 }
-
-const logoSrc = '/wik%20dj%20logo.svg'
 
 type GigCardProps = {
   venue: string
@@ -208,9 +259,12 @@ export default function FrequenciesPage() {
         <a href="https://starwik.com" className={styles.navLogoText}>
           DJ PRESS KIT · 2026
         </a>
-        <a href="#book" className={styles.navBook}>
-          GET IN TOUCH
-        </a>
+        <div className={styles.navActions}>
+          <ListenButton />
+          <a href="#book" className={styles.navBook}>
+            GET IN TOUCH
+          </a>
+        </div>
       </nav>
 
       <section className={styles.hero}>
@@ -232,23 +286,14 @@ export default function FrequenciesPage() {
         </div>
         <div className={styles.heroContent}>
           <h1 className={styles.heroName}>
-            <Image
-              src={logoSrc}
-              alt="★wik"
-              width={500}
-              height={500}
-              loading="eager"
-              unoptimized
-              className={styles.heroNameLogo}
-            />
+            <WikLogo className={styles.heroNameLogo} aria-label="★wik" role="img" />
           </h1>
-          <p className={styles.heroRole}>Experience Curator</p>
-          <div className={styles.heroTags}>
-            {heroTags.map((tag) => (
-              <span key={tag} className={styles.heroTag}>
-                {tag}
-              </span>
-            ))}
+          <div className={styles.heroMeta}>
+            <span className={styles.heroRole}>Experience Curator</span>
+            <span className={styles.heroNowPlaying}>
+              <span className={styles.heroMetaDot} aria-hidden="true" />
+              Mixing House
+            </span>
           </div>
         </div>
       </section>
@@ -273,22 +318,22 @@ export default function FrequenciesPage() {
               01 — THE ARTIST
             </span>
             <h2 className={styles.artistName}>
-              Satwik Mekala.
+              Satwik Mekala
               <br />
-              Known as *wik.
+              AKA *wik
             </h2>
           </div>
 
           {/* Right — frosted glass bio card */}
           <div className={styles.artistBioCard}>
             <p className={styles.artistBio}>
-              &ldquo;I grew up writing songs, composing, and connecting to music on an emotional level. When house music found me three years ago, it gave me a lane to go even deeper into myself. I didn&apos;t plan to become a DJ. It was a natural transition that happened out of pure passion for the music and the craft.
+              &ldquo;I grew up writing songs, composing, chasing a feeling before I had the language for it. House music found me three years ago and gave that same instinct a new room to move in. I didn&apos;t decide to become a DJ; it happened because the craft demanded it.
               <br />
               <br />
-              What I&apos;m equally passionate about is curating experiences. I&apos;m naturally observant, which means I can read a dance floor really well. I understand the energy, feel the shifts, and bring people into the vibe by being the vibe behind the decks. The connection between me and the floor is where it all comes alive.
+              A year-plus behind the decks has sharpened that instinct into something I can actually trust. I understand the energy as a dancer myself, and bring people into the vibe by being the vibe behind the decks. The connection between me and the floor is where it all comes alive.
               <br />
               <br />
-              Can&apos;t wait to bring more vibes to you.&rdquo;
+              Can&apos;t wait to see you on the dance floor soon.&rdquo;
             </p>
             <div className={styles.artistGenres}>
               {artistGenres.map((genre) => (
@@ -325,6 +370,49 @@ export default function FrequenciesPage() {
         <h2 className={fade('d1', styles.mixesHeading)} data-frequency-fade>
           Recorded Sets.
         </h2>
+
+        <div className={fade('d2', styles.release)} data-frequency-fade>
+          <div className={styles.releaseCover}>
+            <Image
+              src={latestRelease.cover}
+              alt={`${latestRelease.title} — cover art`}
+              fill
+              sizes="(min-width: 1024px) 300px, (min-width: 640px) 200px, 340px"
+              className={styles.releaseCoverImg}
+            />
+          </div>
+
+          <div className={styles.releaseInfo}>
+            <span className={styles.releaseEyebrow}>
+              <span className={styles.releaseDot} aria-hidden="true" />
+              {latestRelease.eyebrow}
+            </span>
+            <h3 className={styles.releaseTitle}>{latestRelease.title}</h3>
+            <p className={styles.releaseMeta}>{latestRelease.meta}</p>
+            <div className={styles.releaseTags}>
+              {latestRelease.tags.map((tag) => (
+                <span key={tag} className={styles.releaseTag}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <p className={styles.releaseDesc}>{latestRelease.desc}</p>
+          </div>
+
+          <div className={styles.releasePlayer}>
+            <iframe
+              className={styles.releaseEmbed}
+              title={`${latestRelease.title} — SoundCloud player`}
+              src={latestRelease.embedSrc}
+              allow="autoplay"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <span className={fade('d3', styles.mixesSubLabel)} data-frequency-fade>
+          YouTube mixes
+        </span>
         <div className={styles.mixesGrid}>
           {mixes.map((mix, index) => (
             <article

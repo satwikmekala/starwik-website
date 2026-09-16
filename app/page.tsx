@@ -27,11 +27,11 @@ const portals = [
     accentColor: '#B07820',
   },
   {
-    id: 'transmit',
+    id: 'thoughts',
     number: '03',
     name: 'thoughts',
     descriptor: "whatever's on my mind",
-    href: '/transmit',
+    href: '/thoughts',
     accentColor: '#4858C8',
   },
   {

@@ -1,0 +1,822 @@
+/* ═══════════════════════════════════════════════════════
+   ELSEWHERE — /drift
+   The map is the page. Scroll is the engine.
+   ═══════════════════════════════════════════════════════ */
+
+.experience {
+  position: relative;
+  background: #07070a;
+}
+
+/* Invisible scroll runway — one viewport per chapter */
+.scrollTrack {
+  position: relative;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* ── THE MAP ──
+   Mapbox's own stylesheet ships `.mapboxgl-map { position: relative }`
+   at equal specificity to a single class selector, and it loads after
+   this module — so it wins the cascade and collapses the container to
+   0 height unless we out-specify it. `:global` duplication does that. */
+.mapContainer.mapContainer:global(.mapboxgl-map) {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #07070a;
+}
+
+/* The spec asks for no visible Mapbox branding; note that Mapbox ToS
+   normally requires the wordmark — a whispered text attribution is
+   kept in .attribution instead. */
+.mapContainer :global(.mapboxgl-ctrl-logo) {
+  display: none;
+}
+.mapContainer :global(.mapboxgl-ctrl-bottom-left),
+.mapContainer :global(.mapboxgl-ctrl-bottom-right) {
+  display: none;
+}
+
+.mapLoading {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07070a;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  color: rgba(242, 237, 230, 0.25);
+}
+
+/* ── CONSTELLATION OVERLAY ── */
+.constellationSvg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.constellationPath {
+  fill: none;
+  stroke: rgba(232, 160, 64, 0.55);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px rgba(196, 90, 24, 0.5));
+}
+
+/* ── PROGRESS — 1px amber line, very left edge ──
+   Fills chapter by chapter; the 400ms transition does the gliding. */
+.progressTrack {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  z-index: 25;
+  background: var(--border-subtle, rgba(242, 237, 230, 0.08));
+}
+
+.progressFill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #e8a040, #c45a18);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.4s ease;
+  box-shadow: 0 0 8px rgba(232, 160, 64, 0.5);
+}
+
+/* ── BACK LINK ── */
+.backLink {
+  position: fixed;
+  top: 1.2rem;
+  left: 1.5rem;
+  z-index: 30;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: rgba(242, 237, 230, 0.4);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.backLink:hover {
+  color: #e8a040;
+}
+
+/* ── COORDS READOUT ── */
+.coordsReadout {
+  position: fixed;
+  top: 1.2rem;
+  right: calc(380px + 1.5rem);
+  z-index: 20;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  color: rgba(232, 160, 64, 0.45);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── SCROLL HINT ── */
+.scrollHint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(calc(-50% - 190px)); /* centred over the map area */
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  color: rgba(242, 237, 230, 0.9);
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.scrollHint > span:first-child {
+  animation: hintPulse 2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.scrollHintHidden {
+  opacity: 0;
+}
+
+.scrollHintLine {
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(to bottom, rgba(232, 160, 64, 0.6), transparent);
+  animation: hintDrop 2.2s ease-in-out infinite;
+}
+
+@keyframes hintDrop {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+
+/* ── ATTRIBUTION (whispered) ── */
+.attribution {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 1.5rem;
+  z-index: 5;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.45rem;
+  letter-spacing: 0.1em;
+  color: rgba(242, 237, 230, 0.14);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   CHAPTER PANEL — right side, 380px
+   Grain comes from the global body::after overlay.
+   ═══════════════════════════════════════════════ */
+
+.panel {
+  --warm: #c45a18;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: rgba(7, 7, 10, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-left: 1px solid rgba(196, 90, 24, 0.12);
+  /* `backwards` (not `both`) — a persisting end keyframe would
+     pin opacity:1 and defeat the .panelFlying soften */
+  animation: panelSlideIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease;
+}
+
+/* Warm ember glow breathing down from the top of the panel */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: radial-gradient(
+    ellipse 120% 100% at 50% 0%,
+    rgba(196, 90, 24, 0.06),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* Mid-flight the panel softens, refocusing on arrival */
+.panelFlying {
+  opacity: 0.7;
+  filter: blur(1px);
+}
+
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ── PERSISTENT HEADER — counter + arc badge ── */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 4.2rem 2.2rem 0;
+  animation: riseIn 0.55s ease both;
+}
+
+.panelCounter {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  color: rgba(232, 160, 64, 0.7);
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.counterTotal {
+  white-space: pre;
+  color: rgba(232, 160, 64, 0.45);
+}
+
+/* Odometer — digits roll on vertical reels */
+.odometer {
+  display: inline-flex;
+}
+
+.digitCol {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.digitReel {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.digitCell {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+.arcBadge {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.25em;
+  color: rgba(232, 160, 64, 0.75);
+  border: 1px solid rgba(196, 90, 24, 0.15);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem 0.15rem;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.arcBadgeVisible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── STACKED CONTENT LAYERS ── */
+.panelStack {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.panelContent {
+  position: absolute;
+  inset: 0;
+  padding: 1.5rem 2.2rem 2.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.panelContent::-webkit-scrollbar {
+  display: none;
+}
+
+/* Chapter swap: exit up, enter from below — simultaneously */
+.panelContentEntering {
+  animation: chapterIn 0.4s ease-out both;
+}
+
+.panelContentLeaving {
+  animation: chapterOut 0.4s ease-out both;
+  pointer-events: none;
+}
+
+@keyframes chapterIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chapterOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* The title arrives with weight — a beat slower than the layer */
+.panelContentEntering .panelTitle {
+  animation: titleRise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes titleRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── ENTRY MOMENT — first load only, each element 80ms apart ── */
+.panelIntro > * {
+  opacity: 0;
+  animation: riseIn 0.55s ease both;
+  animation-delay: calc(var(--d, 0) * 80ms);
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── PANEL TYPOGRAPHY ── */
+.panelTitle {
+  font-family: var(--font-display), serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: #f2ede6;
+  margin: 0;
+}
+
+.panelSubtitle {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.28em;
+  color: rgba(242, 237, 230, 0.35);
+  margin-top: 0.7rem;
+}
+
+/* Short left-aligned rule between subtitle and quote */
+.panelDivider {
+  width: 40px;
+  height: 1px;
+  margin: 1.5rem 0;
+  background: var(--border-subtle, rgba(242, 237, 230, 0.08));
+}
+
+.panelQuote {
+  font-family: var(--font-display), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: rgba(242, 237, 230, 0.55);
+  margin: 0 0 1.4rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid
+    color-mix(in srgb, var(--warm, #c45a18) 60%, transparent);
+}
+
+.panelDescription {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  line-height: 2;
+  letter-spacing: 0.02em;
+  color: rgba(242, 237, 230, 0.5);
+  margin: 0 0 1.6rem;
+}
+
+.panelTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.8rem;
+}
+
+.panelTag {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.45rem;
+  letter-spacing: 0.18em;
+  color: rgba(232, 160, 64, 0.7);
+  border: 1px solid rgba(196, 90, 24, 0.25);
+  border-radius: 2px;
+  padding: 0.25rem 0.55rem;
+  transition: background 0.15s ease;
+}
+
+.panelTag:hover {
+  background: rgba(196, 90, 24, 0.1);
+}
+
+/* ── OVERVIEW (ARC) CHAPTERS — quieter, journal-like ── */
+.panelOverview .panelTitle {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+}
+
+.panelOverview .panelDescription {
+  font-family: var(--font-display), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 0.95rem;
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  color: rgba(242, 237, 230, 0.55);
+}
+
+/* ── PHOTO STRIP — horizontal scroll with snap ── */
+.panelPhotosSection {
+  margin-top: auto; /* pin the strip toward the bottom of the panel */
+  padding-top: 1rem;
+}
+
+.panelPhotosLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.3em;
+  color: rgba(232, 160, 64, 0.6);
+  margin-bottom: 0.8rem;
+}
+
+.panelPhotosLabel::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(196, 90, 24, 0.12);
+}
+
+.photoStrip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.photoStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.photoSlot {
+  position: relative;
+  flex: 0 0 180px;
+  width: 180px;
+  aspect-ratio: 4 / 3;
+  scroll-snap-align: start;
+  border-radius: 8px;
+  background: rgba(242, 237, 230, 0.04);
+  border: 1px dashed rgba(242, 237, 230, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition:
+    border-color 0.3s,
+    background 0.3s;
+}
+
+/* Waiting-to-be-filled shimmer */
+.photoSlot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(242, 237, 230, 0.05) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 3.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.photoSlot:hover {
+  border-color: rgba(232, 160, 64, 0.3);
+  background: rgba(232, 160, 64, 0.05);
+}
+
+.photoSlotLabel {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.25em;
+  color: rgba(242, 237, 230, 0.22);
+}
+
+/* ═══════════════════════════════════════════════
+   DOT NAVIGATION — fixed, left side
+   ═══════════════════════════════════════════════ */
+
+.dotNav {
+  position: fixed;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dotItem {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: none;
+  border: none;
+  padding: 1px;
+  cursor: pointer;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 160, 64, 0.4);
+  background: transparent;
+  transition:
+    background 0.35s,
+    border-color 0.35s,
+    box-shadow 0.35s;
+}
+
+.dotVisited .dot {
+  background: rgba(196, 90, 24, 0.55);
+  border-color: rgba(196, 90, 24, 0.55);
+}
+
+.dotCurrent .dot {
+  background: #e8a040;
+  border-color: #e8a040;
+  box-shadow: 0 0 0 3px rgba(196, 90, 24, 0.25);
+  animation: dotBreathe 2.4s ease-in-out infinite;
+}
+
+@keyframes dotBreathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(196, 90, 24, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(196, 90, 24, 0.35);
+  }
+}
+
+.dotLabel {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.22em;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(242, 237, 230, 0.6);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.dotItem:hover .dotLabel,
+.dotItem:focus-visible .dotLabel {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.dotCurrent .dotLabel {
+  color: #e8a040;
+}
+
+/* ═══════════════════════════════════════════════
+   FALLBACK — missing Mapbox token
+   ═══════════════════════════════════════════════ */
+
+.fallback {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07070a;
+  padding: 2rem;
+}
+
+.fallbackInner {
+  max-width: 420px;
+  text-align: center;
+}
+
+.fallbackKicker {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  color: rgba(232, 160, 64, 0.6);
+  margin-bottom: 1.4rem;
+}
+
+.fallbackTitle {
+  font-family: var(--font-display), serif;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 300;
+  color: #f2ede6;
+  margin: 0 0 1.2rem;
+}
+
+.fallbackBody {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.65rem;
+  line-height: 2;
+  color: rgba(242, 237, 230, 0.45);
+}
+
+.fallbackBody code {
+  color: rgba(232, 160, 64, 0.8);
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE STACK (<768px) — simple vertical cards
+   TODO: MOBILE SCROLL EXPERIENCE — rebuild this as a
+   touch-driven vertical journey with the map as background
+   ═══════════════════════════════════════════════ */
+
+.mobileStack {
+  min-height: 100svh;
+  background: #07070a;
+  padding: 4.5rem 1.2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.mobileHeader {
+  margin-bottom: 0.6rem;
+}
+
+.mobileKicker {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.35em;
+  color: rgba(232, 160, 64, 0.6);
+  margin-bottom: 0.6rem;
+}
+
+.mobileTitle {
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.2rem, 9vw, 3rem);
+  font-weight: 300;
+  color: #f2ede6;
+  margin: 0;
+}
+
+.mobileCard {
+  border: 1px solid rgba(196, 90, 24, 0.14);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(7, 7, 10, 0.92);
+}
+
+.mobileMiniMap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  filter: saturate(0.9);
+  border-bottom: 1px solid rgba(196, 90, 24, 0.12);
+}
+
+.mobileCardBody {
+  padding: 1.4rem 1.3rem 1.6rem;
+}
+
+.mobileCardBody .panelCounter {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.mobileCardBody .panelTitle {
+  font-size: clamp(1.7rem, 7vw, 2.2rem);
+}
+
+.mobileCardBody .photoSlot {
+  flex: 0 0 60%;
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panelContentEntering,
+  .panelContentLeaving,
+  .panelContentEntering .panelTitle,
+  .panelIntro > *,
+  .panelHeader,
+  .scrollHintLine,
+  .scrollHint > span:first-child,
+  .photoSlot::after {
+    animation: none;
+  }
+  .panelIntro > * {
+    opacity: 1;
+  }
+  .dotCurrent .dot {
+    animation: none;
+  }
+  .digitReel {
+    transition: none;
+  }
+  .progressFill {
+    transition: none;
+  }
+}

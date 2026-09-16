@@ -1,0 +1,431 @@
+/* ── THE READING — the card, grown to be the page ─────────────────
+   The title page repeats the card's composition at full size
+   (kicker 12.5% · title 44% · subtitle 66%), so the card's words
+   can travel straight into place. The body is a literary column.
+──────────────────────────────────────────────────────────────── */
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 21;
+  height: 1px;
+  pointer-events: none;
+}
+
+.progressFill {
+  height: 1px;
+  background: var(--th-ember);
+  opacity: 0.55;
+  transform-origin: 0 50%;
+}
+
+.reader {
+  --gutter: clamp(1.4rem, 5vw, 3rem);
+  --measure: min(40rem, calc(100vw - 2 * var(--gutter)));
+
+  position: relative;
+  z-index: 7;
+  padding-bottom: clamp(6rem, 14vh, 10rem);
+  color: var(--th-ink);
+  font-family: var(--th-serif);
+}
+
+.reader a:focus-visible {
+  outline: 1px solid var(--th-ink-soft);
+  outline-offset: 5px;
+}
+
+/* ── TITLE PAGE ── */
+
+.titlePage {
+  position: relative;
+  height: max(100svh, 560px);
+}
+
+.kicker,
+.title,
+.subtitle,
+.meta {
+  position: absolute;
+  left: 50%;
+  width: max-content;
+  translate: -50% -50%;
+}
+
+.kicker {
+  top: 12.5%;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 0.68rem + 0.32vw, 0.98rem);
+  letter-spacing: 0.2em;
+  color: var(--th-ink-soft);
+}
+
+.title {
+  top: 44%;
+  max-width: 96vw;
+  margin: 0;
+  font: inherit;
+  outline: none;
+}
+
+.titleInner {
+  display: grid;
+  justify-items: center;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(3.2rem, 9vw, 8.4rem);
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  color: var(--th-ink);
+  transform: rotate(-3deg);
+}
+
+.titleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.titleLine:nth-child(2) {
+  translate: 0.4em 0;
+}
+
+.subtitle {
+  top: 66%;
+  max-width: 94vw;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  font-weight: 500;
+  font-size: clamp(0.82rem, 0.72rem + 0.55vw, 1.3rem);
+  line-height: 1.7;
+  letter-spacing: 0.11em;
+  color: var(--th-ink-soft);
+}
+
+.subtitleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.meta {
+  top: 80%;
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+}
+
+.metaRule {
+  color: var(--th-ink-faint);
+}
+
+.metaLine {
+  display: flex;
+  gap: 0.7em;
+  font-style: italic;
+  font-size: 0.98rem;
+  letter-spacing: 0.05em;
+  color: var(--th-ink-faint);
+  white-space: nowrap;
+}
+
+.metaDot {
+  font-style: normal;
+}
+
+.cue {
+  position: absolute;
+  bottom: 3%;
+  left: 50%;
+  translate: -50% 0;
+  color: var(--th-ink-faint);
+}
+
+.cue svg {
+  display: block;
+  transform: rotate(90deg);
+  animation: cue 3.4s ease-in-out infinite;
+}
+
+/* ── BODY — a literary column ── */
+
+.body {
+  width: var(--measure);
+  margin: 0 auto;
+  padding-top: clamp(2.5rem, 7vh, 5rem);
+  font-weight: 500;
+  font-size: clamp(1.16rem, 0.98rem + 0.6vw, 1.38rem);
+  line-height: 1.74;
+  color: var(--th-ink);
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  hanging-punctuation: first;
+  text-wrap: pretty;
+}
+
+.paragraph {
+  margin: 0 0 1.15em;
+}
+
+.paragraph em,
+.heading em {
+  font-style: italic;
+}
+
+.heading {
+  margin: 3.1em 0 1.05em;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.32em;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+.body > .heading:first-child {
+  margin-top: 0;
+}
+
+.quote {
+  margin: 2.5em 0 2.7em;
+  padding: 0.1em 0 0.1em 1.3em;
+  border-left: 1px solid rgba(33, 28, 23, 0.22);
+}
+
+.quoteText {
+  margin: 0;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.4em;
+  line-height: 1.42;
+}
+
+.quoteText p {
+  margin: 0;
+}
+
+.quoteCite {
+  margin-top: 0.85em;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.8em;
+  letter-spacing: 0.04em;
+  color: var(--th-ink-faint);
+}
+
+.break {
+  display: flex;
+  justify-content: center;
+  margin: 3.3em 0 3.1em;
+  color: var(--th-ink-faint);
+}
+
+.figure {
+  margin: 3em 0;
+}
+
+/* photographs may step out of the column */
+.figure[data-width='wide'] {
+  width: min(68rem, calc(100vw - 2 * var(--gutter)));
+  margin-left: 50%;
+  translate: -50% 0;
+}
+
+.figure[data-width='full'] {
+  width: 100vw;
+  margin-left: 50%;
+  translate: -50% 0;
+}
+
+.frame {
+  position: relative;
+  overflow: hidden;
+}
+
+/* printed onto the paper, not pasted on it */
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--th-paper-surface);
+  background-size: auto, auto, 240px 240px, 600px 600px;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.figureImage {
+  object-fit: cover;
+  filter: saturate(0.8) contrast(1.02);
+}
+
+.caption {
+  width: var(--measure);
+  margin: 0.9rem auto 0;
+  font-style: italic;
+  font-size: 0.8em;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: var(--th-ink-faint);
+}
+
+/* ── THE END — somewhere to go, and nothing else ── */
+
+.end {
+  width: var(--measure);
+  margin: clamp(5rem, 12vh, 8rem) auto 0;
+  display: grid;
+  justify-items: center;
+  gap: 2.4rem;
+  text-align: center;
+}
+
+.endMark {
+  color: var(--th-ink-faint);
+}
+
+.next {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.5rem;
+  color: var(--th-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nextLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+  color: var(--th-ink-soft);
+}
+
+.nextArrow {
+  width: 1.6em;
+  height: auto;
+  transition: transform 0.6s var(--th-ease-out);
+}
+
+.next:hover .nextArrow,
+.next:focus-visible .nextArrow {
+  transform: translateX(4px);
+}
+
+.nextTitle {
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  line-height: 1.1;
+}
+
+.nextNumber {
+  margin-right: 0.35em;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.42em;
+  letter-spacing: 0.18em;
+  vertical-align: 0.5em;
+  color: var(--th-ink-faint);
+}
+
+.returnLink {
+  padding: 0.5rem;
+  font-family: var(--th-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  color: var(--th-ink-faint);
+  text-decoration: none;
+  transition: color 0.4s ease;
+}
+
+.returnLink:hover {
+  color: var(--th-ink);
+}
+
+/* ── arriving straight onto the page (deep link) ── */
+
+.reader[data-entrance] .kicker {
+  animation: rise 1.3s var(--th-ease-out) 0.35s backwards;
+}
+
+.reader[data-entrance] .title {
+  animation: rise 1.5s var(--th-ease-out) 0.5s backwards;
+}
+
+.reader[data-entrance] .subtitle {
+  animation: rise 1.4s var(--th-ease-out) 0.75s backwards;
+}
+
+.reader[data-entrance] .meta,
+.reader[data-entrance] .cue,
+.reader[data-entrance] .body {
+  animation: rise 1.4s var(--th-ease-out) 1s backwards;
+}
+
+/* ── phones ── */
+
+@media (max-width: 767px) {
+  .reader {
+    --gutter: 1.35rem;
+  }
+
+  .titleInner {
+    font-size: clamp(2.6rem, 12.2vw, 4.2rem);
+  }
+
+  .subtitle {
+    font-size: clamp(0.72rem, 3.55vw, 0.95rem);
+    letter-spacing: 0.08em;
+  }
+
+  .body {
+    font-size: 1.17rem;
+    line-height: 1.72;
+  }
+
+  .quoteText {
+    font-size: 1.3em;
+  }
+
+  .figure[data-width='wide'] {
+    width: 100vw;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes cue {
+  0%,
+  100% {
+    opacity: 0.35;
+    translate: 0 -3px;
+  }
+  50% {
+    opacity: 1;
+    translate: 0 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue svg {
+    animation: none !important;
+  }
+
+  .reader[data-entrance] .kicker,
+  .reader[data-entrance] .title,
+  .reader[data-entrance] .subtitle,
+  .reader[data-entrance] .meta,
+  .reader[data-entrance] .cue,
+  .reader[data-entrance] .body {
+    animation: none !important;
+  }
+}

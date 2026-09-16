@@ -9,6 +9,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import * as d3 from 'd3'
 import { feature } from 'topojson-client'
 import type { Topology, GeometryCollection } from 'topojson-specification'
@@ -318,6 +319,11 @@ export default function WorldMap() {
 
   return (
     <div ref={containerRef} className="wm-container">
+      {/* Back Button */}
+      <Link href="/" className="wm-back-button">
+        ← BACK
+      </Link>
+
       {/* Counter */}
       <div className="wm-counter">
         {VISITED_CODES.length} COUNTRIES · COUNTING
@@ -471,6 +477,23 @@ export default function WorldMap() {
         @keyframes dotPulse {
           0%, 100% { r: 2.5; opacity: 0.5; }
           50% { r: 4; opacity: 0.9; }
+        }
+
+        /* ── BACK BUTTON ── */
+        .wm-back-button {
+          position: absolute;
+          top: 1.2rem;
+          left: 1.5rem;
+          font-family: var(--font-mono), monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.25em;
+          color: rgba(242, 237, 230, 0.4);
+          z-index: 40;
+          text-decoration: none;
+          transition: color 0.3s;
+        }
+        .wm-back-button:hover {
+          color: #C45A18;
         }
 
         /* ── COUNTER ── */

@@ -1,0 +1,282 @@
+/* ── THE PORTAL — a sheet of writing suspended in the room ── */
+
+.stage {
+  --card-ratio: 0.72;
+  --card-w: min(calc(var(--card-ratio) * 76svh), 562px, 86vw);
+  --card-h: calc(var(--card-w) / var(--card-ratio));
+
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  perspective: 1500px;
+  perspective-origin: 50% 44%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(24px) scale(0.965);
+  /* leaving is quick and quiet */
+  transition:
+    opacity 0.55s ease,
+    transform 0.8s var(--th-ease-in);
+}
+
+/* arriving waits for the title to dissolve, then resolves out of the dusk */
+[data-thoughts-view='portal'] .stage {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 1s var(--th-ease-fade) 0.5s,
+    transform 1.35s var(--th-ease-out) 0.42s;
+}
+
+/* while reading, the card waits (hidden beneath the page) to be folded back into */
+[data-thoughts-view='read'] .stage {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+[data-entrance] .stage {
+  animation: arrive 1.7s var(--th-ease-out) 0.45s backwards;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── shadow — soft, from a light somewhere up and to the left ── */
+
+.shadow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--card-w);
+  height: var(--card-h);
+  margin: calc(var(--card-h) / -2) 0 0 calc(var(--card-w) / -2);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.shadow::before,
+.shadow::after {
+  content: '';
+  position: absolute;
+  border-radius: 6px;
+}
+
+.shadow::before {
+  inset: 2% 0.5% -1.2% 2.5%;
+  background: rgba(0, 0, 0, 0.5);
+  filter: blur(14px);
+}
+
+.shadow::after {
+  inset: 7% -5% -10% 7%;
+  background: rgba(2, 3, 9, 0.62);
+  filter: blur(48px);
+}
+
+[data-thoughts-view='archive'] .shadow,
+[data-thoughts-view='missing'] .shadow {
+  opacity: 0;
+}
+
+[data-thoughts-view='read'] .shadow {
+  opacity: 0;
+}
+
+/* ── rig — tilted, floated and leaned by the depth engine ── */
+
+.rig {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  transform: rotateX(1.4deg) rotateY(-2.2deg) rotateZ(-0.7deg);
+  will-change: transform;
+}
+
+.swap {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── the paper ── */
+
+.card {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  display: block;
+  color: var(--th-ink);
+  text-decoration: none;
+  background-color: var(--th-paper);
+  background-image: var(--th-paper-surface);
+  background-size: auto, auto, 240px 240px, 600px 600px;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 253, 248, 0.38),
+    inset 0 0 50px rgba(122, 98, 66, 0.1);
+  cursor: pointer;
+  outline: none;
+  pointer-events: auto;
+  transition: transform 0.9s var(--th-ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: scale(1.012);
+  }
+}
+
+.card:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 253, 248, 0.38),
+    inset 0 0 50px rgba(122, 98, 66, 0.1),
+    0 0 0 1px rgba(242, 237, 230, 0.7),
+    0 0 0 6px rgba(242, 237, 230, 0.14);
+}
+
+/* the words sit where the title page will print them — see reader.module.css */
+
+.cardKicker,
+.cardTitle,
+.cardSubtitle {
+  position: absolute;
+  left: 50%;
+  width: max-content;
+  max-width: 92%;
+  translate: -50% -50%;
+}
+
+.cardKicker {
+  top: 12.5%;
+  font-family: var(--th-serif);
+  font-weight: 500;
+  font-size: 2.75cqw;
+  letter-spacing: 0.2em;
+  color: var(--th-ink-soft);
+}
+
+.cardTitle {
+  top: 44%;
+}
+
+.cardTitleInner {
+  display: grid;
+  justify-items: center;
+  font-family: var(--th-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 12.4cqw;
+  line-height: 0.96;
+  letter-spacing: -0.01em;
+  color: var(--th-ink);
+  transform: rotate(-3deg);
+}
+
+.cardTitleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.cardTitleLine:nth-child(2) {
+  translate: 0.4em 0;
+}
+
+.cardSubtitle {
+  top: 66%;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  font-family: var(--th-serif);
+  font-weight: 500;
+  font-size: 2.95cqw;
+  line-height: 1.7;
+  letter-spacing: 0.11em;
+  color: var(--th-ink-soft);
+}
+
+.cardSubtitleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.cardCta {
+  position: absolute;
+  bottom: 9.5%;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75em;
+  font-family: var(--th-serif);
+  font-weight: 500;
+  font-size: 2.9cqw;
+  letter-spacing: 0.15em;
+  color: var(--th-ink);
+  opacity: 0.62;
+  transition: opacity 0.5s ease;
+}
+
+.card:hover .cardCta,
+.card:focus-visible .cardCta {
+  opacity: 1;
+}
+
+.cardArrow {
+  width: 1.7em;
+  height: auto;
+  transition: transform 0.6s var(--th-ease-out);
+}
+
+.card:hover .cardArrow,
+.card:focus-visible .cardArrow {
+  transform: translateX(4px);
+}
+
+/* ── phones — the sheet fills most of the frame; the photograph still shows around it ── */
+
+@media (max-width: 767px) {
+  .stage {
+    --card-ratio: 0.64;
+    --card-w: min(calc(var(--card-ratio) * 72svh), 88vw);
+    perspective: 1100px;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.965);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage,
+  [data-thoughts-view='portal'] .stage {
+    transform: none !important;
+    transition: opacity 0.4s ease !important;
+  }
+
+  [data-entrance] .stage {
+    animation: none !important;
+  }
+
+  .rig {
+    will-change: auto;
+  }
+
+  .card,
+  .card:hover {
+    transform: none !important;
+  }
+}
