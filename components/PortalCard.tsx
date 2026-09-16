@@ -2,6 +2,8 @@
 import { forwardRef } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { HandStroke } from '@/app/thoughts/_components/HandStroke'
+import { selectorStroke } from '@/app/thoughts/_components/strokes'
 
 type AudioContextConstructor = new () => AudioContext
 type WebAudioWindow = Window & typeof globalThis & {
@@ -128,41 +130,41 @@ function DriftVisual() {
   )
 }
 
-function TransmitVisual() {
-  const words = ['thought', 'idea', 'feel', 'sense', 'word', 'truth', 'raw', 'mind']
+// a miniature of the Thoughts room: the hand-made marks and the word they summon
+function ThoughtsVisual() {
   return (
     <div style={{
       width: '100%', height: '100%',
-      background: 'radial-gradient(ellipse 80% 80% at 40% 50%, #1A2068 0%, #0A0A3A 50%, transparent 80%), #05050F',
+      background: 'radial-gradient(ellipse 90% 85% at 62% 55%, #1A2068 0%, #0A0A3A 50%, transparent 82%), #05050F',
       position: 'relative', overflow: 'hidden',
     }}>
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: 'radial-gradient(circle, #4858C8 1px, transparent 1px)',
-        backgroundSize: '8px 8px', opacity: 0.1,
+        backgroundSize: '8px 8px', opacity: 0.08,
       }} />
-      {words.map((w, i) => (
-        <span key={w} style={{
-          position: 'absolute',
-          fontFamily: 'var(--font-display), serif',
-          fontSize: `${0.5 + (i % 3) * 0.25}rem`,
-          color: '#4858C8',
-          opacity: 0.08 + (i % 4) * 0.05,
-          top: `${10 + (i * 11) % 80}%`,
-          left: `${5 + (i * 17) % 70}%`,
-          whiteSpace: 'nowrap',
-          fontStyle: 'italic',
-          letterSpacing: '0.05em',
-        }}>{w}</span>
-      ))}
       <div style={{
-        position: 'absolute', left: '50%', top: 0, bottom: 0,
-        width: '1px', background: 'rgba(72,88,200,0.15)',
-      }} />
+        position: 'absolute', left: '10%', top: '50%', transform: 'translateY(-50%)',
+        display: 'flex', flexDirection: 'column', gap: 'clamp(2px, 0.9svh, 8px)', color: '#F2EDE6',
+      }}>
+        {Array.from({ length: 6 }, (_, i) => (
+          <HandStroke
+            key={i}
+            stroke={selectorStroke(i)}
+            style={{ height: 'clamp(6px, 1.4svh, 12px)', width: 'auto', opacity: i === 0 ? 0.9 : 0.4 }}
+          />
+        ))}
+      </div>
+      <span style={{
+        position: 'absolute', left: '56%', top: '50%',
+        transform: 'translate(-50%, -55%) rotate(-3deg)',
+        fontFamily: 'var(--font-display), serif', fontStyle: 'italic', fontWeight: 300,
+        fontSize: 'clamp(1rem, 2.4vw, 1.8rem)', color: '#F2EDE6', opacity: 0.8, whiteSpace: 'nowrap',
+      }}>thoughts</span>
       <div style={{
         position: 'absolute', top: 12, right: 14,
         fontSize: '0.45rem', color: '#4858C8', letterSpacing: '0.12em', opacity: 0.5,
-      }}>◈ LOG</div>
+      }}>≡ FRAGMENTS</div>
     </div>
   )
 }
@@ -204,7 +206,7 @@ function ConstructVisual() {
 const visualMap: Record<string, React.ComponentType> = {
   signal: SignalVisual,
   drift: DriftVisual,
-  transmit: TransmitVisual,
+  thoughts: ThoughtsVisual,
   construct: ConstructVisual,
 }
 

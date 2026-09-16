@@ -1,0 +1,1125 @@
+/* The listening room — a room in the same house as /frequencies.
+   Tokens mirror .page in app/frequencies/frequencies.module.css; the room and
+   dock live outside that page (they persist across routes), so they carry
+   their own copy of the same values. */
+
+.tokens {
+  --bg: #070508;
+  --warm: #c0192b;
+  --warm-bright: #e8334a;
+  --text: #f0ebe3;
+  --text-sec: rgba(240, 235, 227, 0.48);
+  --text-muted: rgba(240, 235, 227, 0.18);
+  --border: rgba(240, 235, 227, 0.07);
+  --border-warm: rgba(192, 25, 43, 0.28);
+  --line: rgba(240, 235, 227, 0.12);
+  --wave: rgba(240, 235, 227, 0.2);
+  --shadow-warm: 0 22px 56px -18px rgba(70, 6, 16, 0.62), 0 8px 22px -12px rgba(18, 4, 8, 0.7);
+
+  color: var(--text);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── ENTRY ───────────────────────────────────────────────────── */
+
+.entry {
+  composes: tokens;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--line);
+  background: rgba(12, 6, 9, 0.35);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--text-sec);
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.entry:hover {
+  color: var(--text);
+  border-color: rgba(240, 235, 227, 0.28);
+  background: rgba(12, 6, 9, 0.55);
+}
+
+.entry:focus-visible {
+  outline: 1px solid var(--warm);
+  outline-offset: 3px;
+}
+
+.entryInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.entryGlyph {
+  color: var(--warm);
+  font-size: 1.45em;
+  line-height: 0;
+  letter-spacing: 0;
+}
+
+.entryLive .entryGlyph {
+  animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+/* on the narrowest phones the nav has no room for a word — the glyph alone
+   carries it, and the word stays for screen readers */
+@media (max-width: 420px) {
+  .entry {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .entryWord {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1440px) {
+  .entry {
+    padding: 0.6rem 1.3rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* ── ROOM ────────────────────────────────────────────────────── */
+
+.room {
+  composes: tokens;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.roomSurface {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 5, 7, 0.955);
+  -webkit-backdrop-filter: blur(36px) saturate(1.2);
+  backdrop-filter: blur(36px) saturate(1.2);
+}
+
+.roomGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 45% at 12% 0%, rgba(192, 25, 43, 0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 45% at 95% 100%, rgba(150, 14, 36, 0.12) 0%, transparent 70%);
+}
+
+.roomStage {
+  position: absolute;
+  inset: 0;
+}
+
+.roomBar {
+  display: flex;
+  min-height: 2.3rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.roomLabel {
+  color: var(--warm);
+  font-size: 0.44rem;
+  letter-spacing: 0.32em;
+  opacity: 0.75;
+  text-transform: uppercase;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(240, 235, 227, 0.03);
+  color: var(--text-sec);
+  font: inherit;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.pill:hover {
+  border-color: rgba(240, 235, 227, 0.28);
+  background: rgba(240, 235, 227, 0.06);
+  color: var(--text);
+}
+
+.pill:focus-visible,
+.mood:focus-visible,
+.skip:focus-visible,
+.play:focus-visible,
+.track:focus-visible,
+.dockPlay:focus-visible,
+.dockAway:focus-visible {
+  outline: 1px solid var(--warm);
+  outline-offset: 3px;
+}
+
+/* ── CONSTRUCTION (temporary) ───────────────────────────────────
+   Blocks the crate/player behind a blurred "under construction"
+   notice while the listening feature is reworked. */
+
+.construction {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem 1.5rem;
+}
+
+.constructionBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.constructionHeading {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+.constructionSub {
+  color: var(--text-sec);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── BROWSE ──────────────────────────────────────────────────── */
+
+.browse {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.2rem 1.5rem 9rem;
+  scrollbar-width: none;
+}
+
+.browse::-webkit-scrollbar,
+.player::-webkit-scrollbar {
+  display: none;
+}
+
+.browseIntro {
+  margin: 3.4rem 0 2.2rem;
+}
+
+.browseHeading {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 9vw, 4.6rem);
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.browseSub {
+  margin-top: 1rem;
+  color: var(--text-sec);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+}
+
+.moods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 2.6rem;
+}
+
+.mood {
+  position: relative;
+  isolation: isolate;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-sec);
+  font: inherit;
+  font-size: 0.48rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.mood:hover {
+  border-color: rgba(240, 235, 227, 0.26);
+  color: var(--text);
+}
+
+.moodActive,
+.moodActive:hover {
+  border-color: transparent;
+  color: #0b0608;
+}
+
+.moodFill {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: 999px;
+  background: var(--warm);
+  box-shadow: 0 8px 22px -8px rgba(192, 25, 43, 0.6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.4rem 1.1rem;
+  list-style: none;
+}
+
+.empty {
+  margin-top: 1rem;
+  color: var(--text-sec);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.cardItem {
+  min-width: 0;
+}
+
+.card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.card:focus-visible {
+  outline: none;
+}
+
+.card:focus-visible .cardVinyl::after {
+  border-color: var(--warm);
+}
+
+.cardLift {
+  position: relative;
+}
+
+.cardVinyl {
+  width: 100%;
+}
+
+.cardVinyl::after {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+  transition: border-color 0.4s ease;
+}
+
+.cardCurrent .cardVinyl::after {
+  border-color: rgba(240, 235, 227, 0.16);
+}
+
+.cardLabel {
+  position: absolute;
+  bottom: 9%;
+  left: 50%;
+  z-index: 2;
+  max-width: 92%;
+  overflow: hidden;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(14, 7, 10, 0.62);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  box-shadow: var(--shadow-warm);
+  color: var(--text);
+  font-size: 0.46rem;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardLabelMood {
+  color: var(--text-sec);
+  text-transform: uppercase;
+}
+
+.cardMeta {
+  display: flex;
+  min-height: 1em;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+}
+
+.cardNumber {
+  color: var(--text-muted);
+  font-size: 0.44rem;
+  letter-spacing: 0.22em;
+}
+
+.onPlatter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  color: var(--text-sec);
+  font-size: 0.42rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--warm);
+  box-shadow: 0 0 8px rgba(192, 25, 43, 0.85);
+  animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+.dotStill {
+  animation: none;
+  box-shadow: none;
+  opacity: 0.45;
+}
+
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.cardTitle {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text);
+  font-family: var(--font-sans-grotesk);
+  font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.cardInfo {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-sec);
+  font-size: 0.44rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ── VINYL ───────────────────────────────────────────────────── */
+
+.vinyl {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.vinylBloom {
+  position: absolute;
+  inset: 10% 6% -10%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(110, 10, 24, 0.6), rgba(50, 4, 12, 0.32) 60%, transparent);
+  filter: blur(22px);
+  pointer-events: none;
+  transform-origin: 50% 35%;
+}
+
+.vinylLift {
+  position: absolute;
+  inset: 0;
+}
+
+.vinylDisc {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background:
+    /* faint pressing irregularities — they turn with the disc, so spin reads in the grooves */
+    conic-gradient(from 20deg, rgba(255, 255, 255, 0.025), transparent 14%, rgba(255, 255, 255, 0.018) 38%, transparent 55%, rgba(255, 255, 255, 0.022) 78%, transparent 92%),
+    repeating-radial-gradient(circle, transparent 0, transparent 0.85%, rgba(255, 255, 255, 0.045) 1.05%, transparent 1.35%),
+    radial-gradient(circle, #1a1215 0%, #0d090a 62%, #070506 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 22px rgba(0, 0, 0, 0.85);
+  will-change: transform;
+}
+
+.vinylLabel {
+  position: absolute;
+  inset: 14%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(105deg, #150c0f 30%, #25161a 50%, #150c0f 70%);
+  background-size: 260% 100%;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 0 0 3px rgba(255, 255, 255, 0.03);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.vinylCover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.vinylSpindle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.4%;
+  min-width: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #070508;
+  box-shadow:
+    0 0 0 1.5px rgba(240, 235, 227, 0.32),
+    0 0 0 4px rgba(7, 5, 8, 0.32);
+  transform: translate(-50%, -50%);
+}
+
+/* fixed light: the grooves turn beneath it */
+.vinylSheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, transparent 0deg, rgba(255, 255, 255, 0.09) 28deg, transparent 64deg, transparent 180deg, rgba(255, 255, 255, 0.06) 212deg, transparent 246deg);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 71%, #000 73%);
+  mask-image: radial-gradient(circle closest-side, transparent 71%, #000 73%);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -60% 0;
+  }
+}
+
+/* ── PLAYER ──────────────────────────────────────────────────── */
+
+.player {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.2rem 1.5rem 4rem;
+  scrollbar-width: none;
+}
+
+.playerBody {
+  display: grid;
+  align-items: center;
+  gap: 2.4rem;
+  margin-top: 2rem;
+}
+
+.playerDeck {
+  display: flex;
+  justify-content: center;
+}
+
+.playerVinyl {
+  width: min(76vw, 44svh, 440px);
+}
+
+.playerInfo {
+  min-width: 0;
+}
+
+.playerEyebrow {
+  color: var(--warm);
+  font-size: 0.46rem;
+  letter-spacing: 0.28em;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.playerTitle {
+  margin-top: 0.9rem;
+  color: var(--text);
+  font-family: var(--font-sans-grotesk);
+  font-size: clamp(2.9rem, 10vw, 6.2rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  overflow-wrap: anywhere;
+}
+
+.playerMoods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.3rem;
+  list-style: none;
+}
+
+.tag {
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-sec);
+  font-size: 0.42rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.playerNote {
+  max-width: 46ch;
+  margin-top: 1.3rem;
+  color: var(--text-sec);
+  font-size: 0.6rem;
+  letter-spacing: 0.02em;
+  line-height: 1.9;
+}
+
+.wave {
+  margin-top: 2.2rem;
+}
+
+.waveTrack {
+  position: relative;
+  height: 64px;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  touch-action: none;
+}
+
+.waveTrack:focus-visible {
+  box-shadow: 0 0 0 1px var(--border-warm);
+}
+
+.waveCanvas {
+  position: absolute;
+  inset: 0;
+}
+
+.waveCue {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 1px;
+  background: rgba(240, 235, 227, 0.2);
+  pointer-events: none;
+}
+
+/* shaped like the waveform it stands in for */
+.waveSkeleton {
+  position: absolute;
+  inset: 6px 0;
+  overflow: hidden;
+  background: repeating-linear-gradient(90deg, rgba(240, 235, 227, 0.1) 0 2px, transparent 2px 4px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%);
+}
+
+.waveSkeleton::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(240, 235, 227, 0.14) 50%, transparent 100%);
+  content: '';
+  transform: translateX(-100%);
+  animation: sweep 1.5s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.waveTimes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.7rem;
+  color: var(--text-sec);
+  font-size: 0.46rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+}
+
+.skip {
+  display: inline-flex;
+  height: 3rem;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(240, 235, 227, 0.03);
+  color: var(--text-sec);
+  font: inherit;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.skip:hover {
+  border-color: rgba(240, 235, 227, 0.28);
+  color: var(--text);
+}
+
+.play {
+  position: relative;
+  display: inline-grid;
+  width: 5.6rem;
+  height: 4rem;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--text);
+  box-shadow:
+    0 0 0 1.5px var(--warm),
+    0 0 0 6px rgba(192, 25, 43, 0.12),
+    var(--shadow-warm);
+  color: #0b0608;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.5s ease;
+}
+
+.playOn {
+  box-shadow:
+    0 0 0 1.5px var(--warm),
+    0 0 0 7px rgba(192, 25, 43, 0.2),
+    0 0 36px -4px rgba(192, 25, 43, 0.5),
+    var(--shadow-warm);
+}
+
+.play::after {
+  position: absolute;
+  inset: -7px;
+  border: 1.5px solid var(--warm);
+  border-radius: inherit;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+}
+
+.playWaiting::after {
+  animation: breathe 1.3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.playIcon {
+  display: grid;
+  place-items: center;
+}
+
+.notice {
+  margin-top: 1.4rem;
+  color: var(--text-sec);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  line-height: 1.8;
+}
+
+.inlineAction {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border-warm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.unpressed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tracklist {
+  margin-top: 1.8rem;
+}
+
+.trackPanel {
+  overflow: hidden;
+}
+
+.tracks {
+  max-height: min(40svh, 22rem);
+  overflow-y: auto;
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--border);
+  list-style: none;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240, 235, 227, 0.12) transparent;
+}
+
+.track {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 3.6rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.75rem 0.2rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  color: var(--text-sec);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.track:hover,
+.trackActive {
+  color: var(--text);
+}
+
+.trackStatic,
+.trackStatic:hover {
+  color: var(--text-sec);
+  cursor: default;
+}
+
+.trackAt {
+  color: var(--text-muted);
+  font-size: 0.46rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.trackActive .trackAt {
+  color: var(--text-sec);
+}
+
+.trackName {
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+}
+
+.trackArtist {
+  color: var(--text);
+}
+
+.trackHint {
+  margin-top: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.46rem;
+  letter-spacing: 0.12em;
+}
+
+.elsewhere {
+  display: inline-block;
+  margin-top: 1.6rem;
+  color: var(--text-muted);
+  font-size: 0.46rem;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+
+.elsewhere:hover {
+  color: var(--text-sec);
+}
+
+/* ── DOCK ────────────────────────────────────────────────────── */
+
+.dockWrap {
+  composes: tokens;
+  position: fixed;
+  right: 0;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  left: 0;
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  padding: 0 0.75rem;
+  pointer-events: none;
+}
+
+.dock {
+  position: relative;
+  display: flex;
+  width: min(100%, 34rem);
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  padding: 0.5rem;
+  border: 1px solid rgba(240, 235, 227, 0.09);
+  border-radius: 26px;
+  background: rgba(16, 8, 11, 0.56);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow:
+    0 18px 50px -16px rgba(70, 6, 16, 0.7),
+    0 6px 18px -8px rgba(10, 2, 4, 0.6);
+  pointer-events: auto;
+}
+
+.dockExpand {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dockExpand:focus-visible {
+  outline: 1px solid var(--warm);
+  outline-offset: 2px;
+}
+
+.dockVinyl {
+  width: 2.9rem;
+  flex: none;
+}
+
+.dockVinyl .vinylBloom {
+  filter: blur(6px);
+}
+
+.dockText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dockTitle {
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-sans-grotesk);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dockMeta {
+  overflow: hidden;
+  color: var(--text-sec);
+  font-size: 0.42rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dockPlay {
+  display: grid;
+  width: 3.2rem;
+  height: 2.5rem;
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--text);
+  box-shadow: 0 0 0 1.5px var(--warm);
+  color: #0b0608;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dockAway {
+  display: grid;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text-sec);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.dockRail {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 0;
+  left: 1.4rem;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(240, 235, 227, 0.07);
+}
+
+.dockProgress {
+  position: absolute;
+  inset: 0;
+  background: var(--warm);
+  transform-origin: left center;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3.2rem 1.8rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .playerBody {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 4.5rem;
+    max-width: 1280px;
+    min-height: calc(100svh - 7rem);
+    margin: 0 auto;
+  }
+
+  .playerVinyl {
+    width: min(40vw, 64svh, 560px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .browse,
+  .player {
+    padding-right: 4rem;
+    padding-left: 4rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1440px) {
+  .browse,
+  .player {
+    padding-right: 8rem;
+    padding-left: 8rem;
+  }
+
+  .roomLabel,
+  .cardNumber,
+  .cardInfo {
+    font-size: 0.56rem;
+  }
+
+  .pill,
+  .mood {
+    font-size: 0.6rem;
+  }
+
+  .playerEyebrow,
+  .tag {
+    font-size: 0.54rem;
+  }
+
+  .playerNote,
+  .trackName {
+    font-size: 0.72rem;
+  }
+
+  .waveTimes {
+    font-size: 0.56rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinylLabel,
+  .waveSkeleton::after,
+  .dot,
+  .entryLive .entryGlyph,
+  .playWaiting::after {
+    animation: none;
+  }
+}

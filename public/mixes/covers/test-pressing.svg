@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <radialGradient id="paper" cx="42%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#f3ede3"/>
+      <stop offset="1" stop-color="#ddd3c3"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#paper)"/>
+  <circle cx="300" cy="300" r="232" fill="none" stroke="#c0192b" stroke-opacity=".28" stroke-width="1.5"/>
+  <text x="300" y="214" text-anchor="middle" font-family="'Space Mono', 'Courier New', monospace" font-size="20" letter-spacing="9" fill="#1a1216" fill-opacity=".75">TEST PRESSING</text>
+  <text x="300" y="336" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-style="italic" font-size="92" fill="#1a1216">tp 01</text>
+  <path d="M206 364 C 250 350, 330 378, 398 356" stroke="#c0192b" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <text x="300" y="418" text-anchor="middle" font-family="'Space Mono', 'Courier New', monospace" font-size="13" letter-spacing="6" fill="#1a1216" fill-opacity=".45">★WIK · 122 BPM · 45:00</text>
+</svg>

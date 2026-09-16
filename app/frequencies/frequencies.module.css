@@ -166,6 +166,18 @@
   color: var(--warm);
 }
 
+.navActions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* keep the footer clear of the listening dock once a record is on */
+:global(html[data-listening-dock]) .page {
+  padding-bottom: 6rem;
+}
+
 .navBook {
   padding: 0.5rem 1rem;
   border: 1px solid var(--border-warm);
@@ -221,6 +233,12 @@
 }
 
 .heroContent {
+  --hero-logo-w: clamp(14rem, 34vw, 21.5rem);
+  /* the artwork sits inset ~10.9% from the left of the logo's viewBox and spans
+     ~75.6% of its width — derive the visual box so the rule and meta row below
+     can share the logo's exact left and right edges */
+  --hero-logo-inset: calc(var(--hero-logo-w) * 0.1086);
+  --hero-logo-vis: calc(var(--hero-logo-w) * 0.7555);
   position: relative;
   z-index: 2;
   padding: 0 1.5rem;
@@ -236,45 +254,81 @@
 
 .heroName {
   display: block;
-  width: clamp(13rem, 52vw, 27rem);
-  height: clamp(6.8rem, 27vw, 14rem);
-  overflow: hidden;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.45rem calc(var(--hero-logo-inset) * -1);
   line-height: 1;
 }
 
 .heroNameLogo {
   display: block;
-  width: 100%;
+  width: var(--hero-logo-w);
   height: auto;
-  max-width: none;
-  transform: translate(-10%, -23%);
+}
+
+.heroMeta {
+  display: flex;
+  width: var(--hero-logo-vis);
+  min-width: max-content;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5em;
+  /* trailing letter-spacing would hold the last glyph off the logo's right edge */
+  margin: 0.35rem -0.26em 2.05rem 0;
+  font-size: clamp(0.5rem, 1.2vw, 0.58rem);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .heroRole {
-  margin: -0.7rem 0 1.2rem clamp(1.06rem, 4.24vw, 2.2rem);
   color: var(--text-sec);
-  font-size: 0.52rem;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  transform: translateY(-0.25rem);
 }
 
-.heroTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-left: clamp(1.06rem, 4.24vw, 2.2rem);
-  margin-bottom: 2.05rem;
+.heroNowPlaying {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(240, 235, 227, 0.5);
 }
 
-.heroTag {
-  padding: 0.28rem 0.6rem;
-  border: 1px solid rgba(240, 235, 227, 0.1);
-  border-radius: 100px;
-  color: var(--text-muted);
-  font-size: 0.42rem;
-  letter-spacing: 0.14em;
+/* From tablet up the logo is large enough for the meta block to sit on the
+   wordmark's own measured span: the "w" starts at 25.1% and the "k" ends at
+   86.41% of the logo box, so the role line fills exactly that width and
+   "mixing house" centres inside it. */
+@media (min-width: 768px) {
+  .heroMeta {
+    width: calc(var(--hero-logo-w) * 0.6131);
+    min-width: 0;
+    align-items: center;
+    margin: 0.4rem 0 2.05rem calc(var(--hero-logo-w) * 0.1424);
+    font-size: calc(var(--hero-logo-w) * 0.0397);
+  }
+
+  .heroRole,
+  .heroNowPlaying {
+    /* trim each line's trailing letter-space so glyphs define the edges */
+    margin-right: -0.26em;
+  }
+}
+
+.heroMetaDot {
+  width: 0.42em;
+  height: 0.42em;
+  flex: none;
+  margin-right: 0.85em;
+  border-radius: 50%;
+  background: var(--warm);
+  animation: heroNowPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroNowPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    box-shadow: 0 0 0 0 rgba(192, 25, 43, 0);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 8px 1px rgba(192, 25, 43, 0.45);
+  }
 }
 
 .heroWave {
@@ -730,6 +784,18 @@
   filter: brightness(1);
 }
 
+.gigPhotoAntisocial {
+  background: radial-gradient(ellipse 70% 60% at 45% 45%, #4a0a1e 0%, #1a0612 60%, #0c0508 100%);
+}
+
+.gigPhotoExtClubroom {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, #400a1a 0%, #190611 60%, #0b0508 100%);
+}
+
+.gigPhotoKrunklive {
+  background: radial-gradient(ellipse 70% 60% at 55% 50%, #32081a 0%, #17060f 60%, #0a0408 100%);
+}
+
 .gigPhotoMoonshine {
   background: radial-gradient(ellipse 70% 60% at 40% 50%, #5a0a18 0%, #1a0610 60%, #0e0508 100%);
 }
@@ -859,8 +925,8 @@
 .mixesSubLabel {
   display: block;
   margin-bottom: 1.25rem;
-  color: var(--text-muted);
-  font-size: 0.42rem;
+  color: var(--warm);
+  font-size: 0.56rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
 }
@@ -1395,14 +1461,6 @@
 
   .heroEyebrow {
     font-size: 0.58rem;
-  }
-
-  .heroRole {
-    font-size: 0.64rem;
-  }
-
-  .heroTag {
-    font-size: 0.52rem;
   }
 
   .sectionLabel {

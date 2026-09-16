@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ListeningRoomProvider } from '@/components/listening/ListeningRoomProvider'
 
 export const metadata: Metadata = {
   title: '★wik',
@@ -28,7 +29,9 @@ export default function RootLayout({
           }
         `}</style>
       </head>
-      <body>{children}</body>
+      <body>
+        <ListeningRoomProvider>{children}</ListeningRoomProvider>
+      </body>
     </html>
   )
 }
