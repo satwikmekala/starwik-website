@@ -1,0 +1,57 @@
+{
+  "$comment": "Single source of truth for ALL on-screen text in Across the Street. Edit freely; no code changes needed. Each beat is one idea on one screen. `lines` are the visual line breaks (3–5 words). `source` is the paragraph index inside that chapter in content/thoughts/03-sunday-morning.ts. `kind`: prose | dialogue | thought (thought = italic inner voice). Dialogue must stay verbatim. `cue` names the scene state the beat drives. `breathe` gives the beat an extra empty screen after it. `hint` attaches a one-word interaction hint.",
+  "title": "Across the Street",
+  "ui": {
+    "back": "Across the Street",
+    "backHref": "/thoughts",
+    "menu": "Chapters",
+    "menuClose": "Close",
+    "scroll": "Scroll",
+    "readAgain": "Read again",
+    "credits": "Credits",
+    "hints": {
+      "drag": "Drag",
+      "tap": "Tap",
+      "hold": "Hold",
+      "scrub": "Scrub"
+    },
+    "sound": {
+      "on": "Sound on",
+      "off": "Sound off"
+    }
+  },
+  "chapters": [
+    {
+      "id": "sunday-morning",
+      "title": "Sunday Morning",
+      "beats": [
+        { "id": "sm-01", "source": [ 0 ], "kind": "prose", "cue": "beam-sofa", "lines": [ "The sun came up", "over the buildings opposite", "and laid a long block", "of warm light", "across Marcus's living room." ] },
+        { "id": "sm-02", "source": [ 0 ], "kind": "prose", "cue": "beam-rug", "lines": [ "The sofa. The coffee table.", "The plant by the window.", "And finally, the rug." ] },
+        { "id": "sm-03", "source": [ 1 ], "kind": "prose", "cue": "rug-focus", "lines": [ "The rug was new.", "Two weeks choosing it.", "More money than", "he had meant to spend." ] },
+        { "id": "sm-04", "source": [ 1 ], "kind": "prose", "lines": [ "Every morning since,", "he crossed it barefoot", "and felt a small,", "private pleasure." ] },
+        { "id": "sm-05", "source": [ 2 ], "kind": "prose", "cue": "breakfast", "lines": [ "Today he made eggs.", "Slowly, low heat,", "off before they looked done.", "Strawberries in a white bowl,", "washed and halved." ] },
+        { "id": "sm-06", "source": [ 3 ], "kind": "prose", "lines": [ "He started that after Lisbon.", "Alone in a café,", "strawberries on the next table", "beside two pieces of toast.", "Nothing remarkable." ] },
+        { "id": "sm-07", "source": [ 3, 4 ], "kind": "thought", "breathe": true, "lines": [ "But he remembered thinking:", "*People live like this.*" ] },
+        { "id": "sm-08", "source": [ 5 ], "kind": "prose", "lines": [ "For years, Marcus believed", "some people knew", "how to live.", "Others simply", "got through the day." ] },
+        { "id": "sm-09", "source": [ 5 ], "kind": "prose", "lines": [ "People who bought", "flowers for themselves.", "Who travelled alone.", "Who cut strawberries in half", "on a Sunday morning." ] },
+        { "id": "sm-10", "source": [ 6 ], "kind": "prose", "breathe": true, "lines": [ "Now, apparently,", "he was one of them." ] },
+        { "id": "sm-11", "source": [ 7 ], "kind": "prose", "cue": "board", "lines": [ "By the front door,", "a board he put up", "in March." ] },
+        { "id": "sm-12", "source": [ 7 ], "kind": "prose", "cue": "board", "lines": [ "A tram pass from Prague.", "A wristband from Berlin.", "A table by the sea.", "A postcard from Sintra,", "bought and never sent." ], "hint": "drag" },
+        { "id": "sm-13", "source": [ 8 ], "kind": "prose", "cue": "board", "lines": [ "Two hours arranging it.", "Moving things half an inch.", "Stepping back.", "Moving them again." ] },
+        { "id": "sm-14", "source": [ 9, 10 ], "kind": "prose", "cue": "board", "breathe": true, "lines": [ "No one was coming over.", "No one would have noticed", "if it was crooked.", "That had been the point." ] },
+        { "id": "sm-15", "source": [ 11 ], "kind": "prose", "cue": "lean", "lines": [ "From the table,", "leaning toward the window,", "he could see", "where he used to live,", "above a shuttered bank." ] },
+        { "id": "sm-16", "source": [ 12 ], "kind": "prose", "cue": "old-window", "breathe": true, "lines": [ "Third floor.", "Second window from the left." ] },
+        { "id": "sm-17", "source": [ 13 ], "kind": "prose", "cue": "old-window", "lines": [ "Three years there.", "Water through the ceiling.", "A kitchen window", "that never shut,", "a towel in the gap." ] },
+        { "id": "sm-18", "source": [ 13 ], "kind": "prose", "cue": "old-window", "lines": [ "Damp above the bed", "that kept coming back,", "however many times", "they painted over it." ] },
+        { "id": "sm-19", "source": [ 14 ], "kind": "prose", "lines": [ "For three years he said", "he was going to leave.", "When work settled down.", "When he had saved more.", "When things were less complicated." ] },
+        { "id": "sm-20", "source": [ 15 ], "kind": "prose", "lines": [ "Then one Tuesday,", "for no dramatic reason,", "he called three estate agents.", "A month later, a van.", "The move took four hours." ] },
+        { "id": "sm-21", "source": [ 16 ], "kind": "prose", "cue": "both-buildings", "lines": [ "Barely forty metres away.", "For three years,", "another life had been waiting", "across the road." ] },
+        { "id": "sm-22", "source": [ 17 ], "kind": "prose", "lines": [ "Running in the mornings.", "Buying the stupid rug.", "Calling people back.", "Leaving parties", "when he wanted to leave." ] },
+        { "id": "sm-23", "source": [ 18, 19 ], "kind": "prose", "breathe": true, "lines": [ "None of it", "had happened to him.", "He had done it.", "That was the part", "he still wasn't used to." ] },
+        { "id": "sm-24", "source": [ 20 ], "kind": "prose", "cue": "at-window", "lines": [ "He poured coffee", "and went to the window.", "The street below", "was doing its Sunday things." ] },
+        { "id": "sm-25", "source": [ 20 ], "kind": "prose", "cue": "street", "lines": [ "A fruit seller", "setting out crates.", "Two boys, slow on bicycles.", "A woman and a dog", "that had decided", "the walk was over." ] },
+        { "id": "sm-26", "source": [ 21 ], "kind": "prose", "cue": "the-man", "lines": [ "And outside the shuttered bank,", "beneath his old kitchen window,", "a man was shouting", "into a phone." ] }
+      ]
+    }
+  ]
+}
