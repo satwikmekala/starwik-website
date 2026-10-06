@@ -54,3 +54,7 @@ One line each: **decision**, then the reason.
 - **The engine marks itself ready only after its first frame,** so the server-rendered title is never hidden and re-shown (that was costing an LCP entry).
 - **Page metadata and the OG image are prepared in `stories/across-the-street/meta.ts` but not wired.** Route metadata can't depend on a query flag, and the default page has to stay unchanged until the swap.
 - **QA uses Playwright and axe-core from outside the project.** No new dependencies were added to `package.json`; the only changes there are the `story:*` scripts.
+
+## Routing (after the build)
+- **The "across the street" card in the `/thoughts` grid now opens the story by default,** server-rendered through `AcrossTheStreetSSR`. You asked for it to be routed, so this is the swap. `?story=old` keeps the previous article reachable and `?story=specimen` the specimen; `SundayMorningOpeningScene` is still untouched. The `NEXT_PUBLIC_ATS_STORY` env gate is gone.
+- **On desktop the cover title runs on one line,** so the "Scroll" cue clears the door.

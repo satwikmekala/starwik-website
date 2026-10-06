@@ -12,13 +12,12 @@ npm run dev
 
 | URL | What |
 |---|---|
-| `/thoughts/sunday-morning?story=ats` | the story (client-rendered preview, behind the flag) |
+| `/thoughts` → the "across the street" card | opens the story (server-rendered) |
+| `/thoughts/sunday-morning` | the story |
+| `/thoughts/sunday-morning?story=old` | the previous article version of the thought |
 | `/thoughts/sunday-morning?story=specimen` | the visual system: tokens with a live `--distress` slider, type, every drawing |
-| `/thoughts/sunday-morning` | unchanged default thought (no flag) |
 
-Set `NEXT_PUBLIC_ATS_STORY=1` at build time to serve the story **server-rendered by default** on
-`/thoughts/sunday-morning`. That's the post-approval path: the title and every line of the story
-are in the first HTML. Unset, none of the story ships in the default bundle.
+The title and every line of the story are in the first HTML; the engine loads afterwards and adopts it.
 
 ## Scripts
 

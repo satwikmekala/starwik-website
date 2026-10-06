@@ -104,8 +104,13 @@
 [data-ats] .ats-copy em { font-size: 1em; }
 [data-ats] .ats-cover h1 {
   margin: 0;
-  font: 400 clamp(3rem, 1.4rem + 5vw, 6.25rem)/0.98 var(--font-story);
+  font: 400 clamp(3rem, 1.4rem + 4vw, 5.5rem)/0.98 var(--font-story);
   letter-spacing: -0.035em;
+}
+/* desktop: the title runs on one line across the open wall, clear of the door */
+@media (min-width: 1024px), (min-width: 768px) and (orientation: landscape) {
+  [data-ats] .ats-copyframe .ats-cover { width: auto; max-width: 64vw; }
+  [data-ats] .ats-cover h1 { white-space: nowrap; }
 }
 [data-ats] .ats-scrollcue {
   margin: 1.4em 0 0; display: inline-flex; gap: 8px; align-items: center;
