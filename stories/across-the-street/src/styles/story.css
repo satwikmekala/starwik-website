@@ -32,6 +32,9 @@
   --copy-top: 13svh;
   --copy-w: min(36vw, 500px);
   --col-w: min(40vw, 560px);
+  /* mobile bottom sheet: six lines of copy + the back pill (svh: stable when
+     browser bars show/hide; at 390×844 the art above stays at exactly 2×) */
+  --sheet-h: clamp(238px, 28.5svh, 290px);
   /* lines never wrap (they are authored at ≤5 words): size the type to the column */
   --story-size: clamp(22px, calc(var(--copy-w) / 16), 34px);
 }
@@ -61,18 +64,23 @@
 
 /* desktop: a paper column for copy when the camera frames a close-up */
 [data-ats] .ats-sheet { position: absolute; pointer-events: none; background: var(--cloud); }
-[data-ats][data-layout='desktop'] .ats-sheet {
-  left: 0; top: 0; bottom: 0; width: var(--col-w);
-  border-right: 2px solid var(--line);
-  opacity: var(--panel, 0);
+@media (min-width: 1024px), (min-width: 768px) and (orientation: landscape) {
+  [data-ats] .ats-sheet {
+    left: 0; top: 0; bottom: 0; width: var(--col-w);
+    border-right: 2px solid var(--line);
+    opacity: var(--panel, 0);
+  }
 }
 
 /* mobile: the art above, a bottom sheet for the words */
-[data-ats][data-layout='mobile'] .ats-art,
-[data-ats][data-layout='mobile'] .ats-hits { height: calc(100svh - var(--sheet-h, 220px)); }
-[data-ats][data-layout='mobile'] .ats-sheet {
-  left: 0; right: 0; bottom: 0; top: calc(100svh - var(--sheet-h, 220px));
-  border-top: 2px solid var(--line);
+/* layout is chosen in CSS (mirroring layoutFor() in engine/layout.ts) so a
+   server-rendered page is already in its final layout before any script */
+@media (max-width: 767.98px), (max-width: 1023.98px) and (orientation: portrait) {
+  [data-ats] .ats-art, [data-ats] .ats-hits { height: calc(100svh - var(--sheet-h)); }
+  [data-ats] .ats-sheet {
+    left: 0; right: 0; bottom: 0; top: calc(100svh - var(--sheet-h));
+    border-top: 2px solid var(--line);
+  }
 }
 
 /* ── copy ───────────────────────────────────────────── */
@@ -114,13 +122,17 @@
 [data-ats] .ats-endcard.is-active { pointer-events: auto; }
 [data-ats] .ats-endcard a { font: italic 1.5rem/1.2 var(--font-accent); color: var(--line); padding: 10px 0; }
 
-[data-ats][data-layout='mobile'] {
-  --copy-left: max(20px, env(safe-area-inset-left));
-  --copy-top: calc(100svh - var(--sheet-h, 220px) + 18px);
-  --copy-w: calc(100vw - 40px);
+@media (max-width: 767.98px), (max-width: 1023.98px) and (orientation: portrait) {
+  [data-ats] {
+    --copy-left: max(20px, env(safe-area-inset-left));
+    --copy-top: calc(100svh - var(--sheet-h) + 18px);
+    --copy-w: calc(100vw - 40px);
+  }
+  [data-ats] .ats-copy { font-size: max(20px, min(23px, calc((100vw - 40px) / 16))); }
+  [data-ats] .ats-cover h1 { font-size: clamp(2.5rem, 11vw, 3.25rem); }
 }
-[data-ats][data-layout='mobile'] .ats-copy { font-size: max(20px, min(23px, calc((100vw - 40px) / 16))); }
-[data-ats][data-layout='mobile'] .ats-cover h1 { font-size: clamp(2.5rem, 11vw, 3.25rem); }
+/* before the engine is ready (server-rendered first paint), show the cover */
+[data-ats]:not([data-ready]) .ats-cover { opacity: 1; }
 
 /* ── interaction layer ──────────────────────────────── */
 [data-ats] .ats-hits { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }

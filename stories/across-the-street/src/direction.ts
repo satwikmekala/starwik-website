@@ -82,7 +82,7 @@ export const SHOTS: Record<Layout, Record<ShotName, Shot>> = {
 export type Spot = 'table' | 'window' | 'rug' | 'mid' | 'pair' | 'door' | 'board' | 'room' | 'over'
 export const SPOTS: Record<Layout, { marcus: Partial<Record<Spot, readonly [number, number]>>; man: Partial<Record<Spot, readonly [number, number]>> }> = {
   desktop: {
-    marcus: { table: [292, 246], window: [262, 248], rug: [276, 252], mid: [232, 246], pair: [200, 250] },
+    marcus: { table: [292, 246], window: [288, 248], rug: [276, 252], mid: [232, 246], pair: [200, 250] },
     man: { door: [56, 238], board: [166, 238], room: [190, 240], over: [190, 240], pair: [244, 246] },
   },
   mobile: {

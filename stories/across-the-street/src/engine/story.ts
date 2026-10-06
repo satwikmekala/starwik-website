@@ -15,9 +15,8 @@ import { SHOTS, SPOTS, STREET, type Shot } from '../direction.ts'
 import { flatDesktop, flatMobile, streetMobile } from '../scenes/flat.ts'
 import type { SceneDef } from '../scenes/types.ts'
 import { clampView, fitView, lerpView, type Box, type View } from './camera.ts'
-import { chromeMarkup, menuMarkup } from './chrome.ts'
-import { BEATS, inline, type Beat } from './copy.ts'
-import { creditsMarkup } from './credits.ts'
+import { BEATS, type Beat } from './copy.ts'
+import { STEP, storyMarkup } from './markup.ts'
 import { dissolveAt, prepareDissolve } from './dissolve.ts'
 import { Interactions, type Hit } from './interactions.ts'
 import { layoutFor, reducedMotion, type Layout } from './layout.ts'
@@ -29,8 +28,6 @@ gsap.registerPlugin(ScrollTrigger)
 
 type Slot = { kind: 'cover' | 'title' | 'beat' | 'end'; beat: number; h: number; el: HTMLElement; chapter: number; breathe?: boolean }
 
-const STEP = { beat: 72, breathe: 110, title: 55, cover: 90, end: 90 } // svh per slot
-
 export interface StoryHandle { destroy(): void }
 
 export function mountStoryView(root: HTMLElement): StoryHandle {
@@ -40,35 +37,8 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
   const states = buildTimeline(beats)
   const chapterStart = BEATS.chapters.map((_, ci) => beats.findIndex((b) => b.chapter === ci))
 
-  root.innerHTML = `
-    <a id="ats-top" class="visually-hidden" tabindex="-1">${BEATS.title}</a>
-    <div class="ats-story">
-      <div class="ats-stage">
-        <div class="ats-art"></div>
-        <div class="ats-sheet" aria-hidden="true"></div>
-        <div class="ats-copyframe">
-          <header class="ats-cover" data-slot>
-            <h1>${BEATS.title}</h1>
-            <p class="ats-scrollcue" aria-hidden="true"><span>${BEATS.ui.scroll}</span> <svg viewBox="0 0 5 6"><path fill="currentColor" d="M2 0h1v4H2zM0 3h1v1H0zM1 4h1v1H1zM2 5h1v1H2zM3 4h1v1H3zM4 3h1v1H4z"/></svg></p>
-          </header>
-          ${BEATS.chapters.map((c, ci) => `
-          <section class="ats-chapter" id="ch-${c.id}" aria-labelledby="ch-${c.id}-title" data-chapter="${ci}">
-            <h2 id="ch-${c.id}-title" class="ats-chapter-title" data-slot><span class="ats-chapter-no">${ci + 1}</span> ${c.title}</h2>
-            ${c.beats.map((b) => `<p class="ats-copy" data-slot data-beat="${b.id}" data-kind="${b.kind}">${b.lines.map((l) => `<span class="line">${inline(l)} </span>`).join('')}</p>`).join('')}
-          </section>`).join('')}
-          <nav class="ats-endcard" data-slot aria-label="End of story">
-            <a href="#ats-top" class="ats-readagain" data-readagain>${BEATS.ui.readAgain}</a>
-            <a href="#ats-credits" class="ats-creditslink" data-credits>${BEATS.ui.credits}</a>
-          </nav>
-        </div>
-        <div class="ats-hits"></div>
-      </div>
-      <div class="ats-track" aria-hidden="true"></div>
-    </div>
-    ${creditsMarkup()}
-    ${chromeMarkup()}
-    ${menuMarkup()}
-    <p class="visually-hidden" aria-live="polite" data-live></p>`
+  // adopt server-rendered markup if the host sent it; otherwise build it
+  if (!root.querySelector('.ats-story')) root.innerHTML = storyMarkup()
 
   const stage = root.querySelector<HTMLElement>('.ats-stage')!
   const art = root.querySelector<HTMLElement>('.ats-art')!
@@ -88,7 +58,6 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
     } else if (el.classList.contains('ats-endcard')) slots.push({ kind: 'end', beat: beats.length - 1, h: STEP.end, el, chapter: BEATS.chapters.length - 1 })
     else { const b = beats[bi]; slots.push({ kind: 'beat', beat: bi, h: b.breathe ? STEP.breathe : STEP.beat, el, chapter: b.chapter, breathe: b.breathe }); bi++ }
   }
-  track.innerHTML = slots.map((s) => `<div class="ats-step" style="height:${s.h}svh"></div>`).join('')
   const steps = [...track.children] as HTMLElement[]
 
   // ── runtime state ─────────────────────────────────────
@@ -136,8 +105,6 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
   }
 
   const area = () => ({ w: art.clientWidth, h: art.clientHeight })
-  // six lines of 20–23 px copy + the back pill: sized so a 390×844 phone keeps the art at exactly 2×
-  const sheetH = () => Math.round(Math.min(290, Math.max(238, innerHeight * 0.285)))
   const copyBox = (): Box => {
     const a = area()
     const col = Math.min(a.w * 0.4, 560)
@@ -378,6 +345,9 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
     }
     ui.place(hitsFor(f, who), view, art)
     updateCopy()
+    // only now hand the copy over to the engine (the server-rendered cover
+    // stays painted until this frame, so it is never hidden and re-shown)
+    if (!('ready' in root.dataset)) root.dataset.ready = ''
   }
 
   function apply(c: HTMLCanvasElement, v: View) {
@@ -450,7 +420,6 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
   let st: ScrollTrigger | null = null
   const setup = () => {
     layout = layoutFor(innerWidth, innerHeight)
-    root.style.setProperty('--sheet-h', `${sheetH()}px`)
     buildScenes()
     measure()
     updateT()
@@ -463,7 +432,7 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
   ScrollTrigger.config({ ignoreMobileResize: true })
   const onScroll = () => updateT()
   addEventListener('scroll', onScroll, { passive: true })
-  const ro = new ResizeObserver(() => { root.style.setProperty('--sheet-h', `${sheetH()}px`); measure(); dirty = true })
+  const ro = new ResizeObserver(() => { measure(); dirty = true })
   ro.observe(root)
   const motionQuery = matchMedia('(prefers-reduced-motion: reduce)')
   const onMotion = () => { motion = !motionQuery.matches; dirty = true }
@@ -502,7 +471,7 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
     if (jump) { e.preventDefault(); menu.close(); jumpTo(slots.findIndex((s) => s.kind === 'title' && s.chapter === +jump.dataset.jump!)) ; return }
     if (t.closest('[data-menu-close]')) { menu.close(); return }
     if (t.closest('[data-readagain]')) { e.preventDefault(); ui.reset(); scrollTo({ top: 0, behavior: reducedMotion() ? 'instant' : 'smooth' }); root.querySelector<HTMLElement>('#ats-top')?.focus({ preventScroll: true }); return }
-    if (t.closest('[data-credits]')) { e.preventDefault(); menu.open && menu.close(); const c = root.querySelector<HTMLElement>('#ats-credits')!; c.scrollIntoView({ behavior: reducedMotion() ? 'instant' : 'smooth' }); c.focus({ preventScroll: true }) }
+    if (t.closest('[data-credits]')) { e.preventDefault(); if (menu.open) menu.close(); const c = root.querySelector<HTMLElement>('#ats-credits')!; c.scrollIntoView({ behavior: reducedMotion() ? 'instant' : 'smooth' }); c.focus({ preventScroll: true }) }
   }
   root.addEventListener('click', onClick)
   menu.addEventListener('close', () => { menuBtn.setAttribute('aria-expanded', 'false'); menuBtn.focus() })
@@ -519,8 +488,8 @@ export function mountStoryView(root: HTMLElement): StoryHandle {
       ui.destroy()
       root.replaceChildren()
       root.style.removeProperty('--distress')
-      root.style.removeProperty('--sheet-h')
       delete root.dataset.layout
+      delete root.dataset.ready
     },
   }
 }
