@@ -1,10 +1,10 @@
 import { sprite } from './lib/sprite.ts'
 
 /**
- * Mobile canvas 300×400; the composed (safe) frame is 180×300 at (60, 50).
+ * Mobile canvas 360×420; the composed (safe) frame is 180×300 at (90, 60).
  * 180×300 fits a 390×844 phone at exactly 2× above the text sheet.
  */
-export const MOBILE = { w: 300, h: 400, safe: { x: 60, y: 50, w: 180, h: 300 } } as const
+export const MOBILE = { w: 360, h: 420, safe: { x: 90, y: 60, w: 180, h: 300 } } as const
 const X = MOBILE.safe.x, Y = MOBILE.safe.y
 
 /** Portrait: the flat fills the frame. Walls and floor run past every edge. */

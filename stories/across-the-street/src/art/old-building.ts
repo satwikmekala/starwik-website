@@ -28,6 +28,12 @@ export default sprite('old-building', 260, 262, 'the old building across the roa
     for (let y = 232; y < 262; y += 4) { r.rect(24, y, 48, 1, 'line'); r.rect(82, y, 48, 1, 'line') }
     r.box(150, 222, 34, 40, 'sky', { bleed: 'b' })                       // street door
   },
+  glint: (r) => {
+    const { x, y } = OLD_WINDOW
+    r.rect(x + 2, y + 2, 30, 14, 'cloud')                                // the old kitchen window catching the sun
+    r.rect(x + 2, y + 18, 30, 14, 'cloud')
+    r.rect(x + 6, y + 6, 6, 2, 'sky'); r.rect(x + 22, y + 22, 6, 2, 'sky')
+  },
   towel: (r) => {
     const { x, y } = OLD_WINDOW
     r.box(x + 4, y + 13, 26, 6, 'cloud', { weight: 1 })                    // towel in the gap

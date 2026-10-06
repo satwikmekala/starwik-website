@@ -8,18 +8,21 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SPRITES } from '../src/art/index.ts'
+import { CORE, LATE } from '../src/art/index.ts'
 import { toPaths } from '../src/art/lib/paths.ts'
 import { render } from '../src/art/lib/sprite.ts'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const out = join(here, '../src/art/generated/sprites.json')
 const stats = process.argv.includes('--stats')
+const seen = new Set<string>()
 
+function compile(list: typeof CORE, file: string) {
+const out = join(here, '../src/art/generated', file)
 const result: Record<string, unknown> = {}
 let total = 0
-for (const def of SPRITES) {
-  if (result[def.name]) throw new Error(`duplicate sprite name: ${def.name}`)
+for (const def of list) {
+  if (seen.has(def.name)) throw new Error(`duplicate sprite name: ${def.name}`)
+  seen.add(def.name)
   const parts: Record<string, unknown> = {}
   for (const part of Object.keys(def.parts)) {
     const paths = toPaths(render(def, part))
@@ -33,4 +36,7 @@ for (const def of SPRITES) {
 mkdirSync(dirname(out), { recursive: true })
 const json = JSON.stringify(result)
 writeFileSync(out, json + '\n')
-console.log(`compiled ${SPRITES.length} sprites, ${total} rects, ${(json.length / 1024).toFixed(1)} KB → ${out}`)
+console.log(`${file}: ${list.length} sprites, ${total} rects, ${(json.length / 1024).toFixed(1)} KB`)
+}
+compile(CORE, 'sprites.json')
+compile(LATE, 'sprites-late.json')

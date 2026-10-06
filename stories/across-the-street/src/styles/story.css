@@ -28,57 +28,135 @@
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  --copy-left: max(24px, 5vw);
+  --copy-top: 13svh;
+  --copy-w: min(36vw, 500px);
+  --col-w: min(40vw, 560px);
+  /* lines never wrap (they are authored at ≤5 words): size the type to the column */
+  --story-size: clamp(22px, calc(var(--copy-w) / 16), 34px);
 }
 [data-ats] *, [data-ats] *::before, [data-ats] *::after { box-sizing: border-box; }
 [data-ats] :focus-visible { outline: 2px solid var(--line); outline-offset: 3px; }
+[data-ats] a { color: inherit; }
 
-/* ── stage ───────────────────────────────────────────── */
-[data-ats] .ats-stage { position: relative; height: 100svh; overflow: hidden; }
-[data-ats] .ats-art { position: absolute; inset: 0 0 var(--art-bottom, 0) 0; }
-[data-ats] .ats-scene { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-[data-ats] .ats-scene [data-hidden] { display: none; }
-[data-ats] .ats-sunbeam { opacity: 0.75; pointer-events: none; }
+/* ── stage: one sticky frame over a track of empty steps ───────── */
+[data-ats] .ats-story { position: relative; }
+[data-ats] .ats-stage {
+  position: sticky; top: 0; z-index: 0;
+  height: 100vh; height: 100lvh;
+  overflow: hidden;
+  background: var(--sky);
+}
+[data-ats] .ats-track { margin-top: -100vh; margin-top: -100lvh; }
+[data-ats] .ats-step { pointer-events: none; }
+[data-ats] .ats-art { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; }
+[data-ats] .ats-canvas {
+  position: absolute; left: 0; top: 0;
+  transform-origin: 0 0;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  will-change: transform;
+}
+[data-ats] .ats-street { opacity: 0; }
 
-/* ── story copy ──────────────────────────────────────── */
+/* desktop: a paper column for copy when the camera frames a close-up */
+[data-ats] .ats-sheet { position: absolute; pointer-events: none; background: var(--cloud); }
+[data-ats][data-layout='desktop'] .ats-sheet {
+  left: 0; top: 0; bottom: 0; width: var(--col-w);
+  border-right: 2px solid var(--line);
+  opacity: var(--panel, 0);
+}
+
+/* mobile: the art above, a bottom sheet for the words */
+[data-ats][data-layout='mobile'] .ats-art,
+[data-ats][data-layout='mobile'] .ats-hits { height: calc(100svh - var(--sheet-h, 220px)); }
+[data-ats][data-layout='mobile'] .ats-sheet {
+  left: 0; right: 0; bottom: 0; top: calc(100svh - var(--sheet-h, 220px));
+  border-top: 2px solid var(--line);
+}
+
+/* ── copy ───────────────────────────────────────────── */
+[data-ats] .ats-copyframe { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+[data-ats] .ats-copyframe [data-slot] {
+  position: absolute; margin: 0;
+  left: var(--copy-left); top: var(--copy-top); width: var(--copy-w);
+  opacity: 0;
+}
 [data-ats] .ats-copy {
-  margin: 0;
   font-size: var(--story-size);
   line-height: var(--story-leading);
   letter-spacing: var(--story-tracking);
   font-weight: 400;
-  text-wrap: balance;
 }
-[data-ats] .ats-copy .line { display: block; }
-[data-ats] .ats-copy em {
-  font-family: var(--font-accent);
-  font-style: italic;
-  font-size: 1.12em;
-  letter-spacing: 0;
+[data-ats] .ats-copy .line { display: block; white-space: nowrap; }
+[data-ats] .ats-copy em, [data-ats] .ats-copy[data-kind='thought'] {
+  font-family: var(--font-accent); font-style: italic; letter-spacing: 0;
 }
-/* desktop: copy sits on the open wall, positioned in art space by JS */
-[data-ats] .ats-copy[data-place='wall'] {
-  position: absolute;
-  left: var(--copy-x); top: var(--copy-y); width: var(--copy-w); min-height: var(--copy-h);
-  display: flex; flex-direction: column; justify-content: center;
+[data-ats] .ats-copy[data-kind='thought'] { font-size: calc(var(--story-size) * 1.15); }
+[data-ats] .ats-copy em { font-size: 1em; }
+[data-ats] .ats-cover h1 {
+  margin: 0;
+  font: 400 clamp(3rem, 1.4rem + 5vw, 6.25rem)/0.98 var(--font-story);
+  letter-spacing: -0.035em;
 }
+[data-ats] .ats-scrollcue {
+  margin: 1.4em 0 0; display: inline-flex; gap: 8px; align-items: center;
+  font: italic 1.125rem/1 var(--font-accent); color: var(--line);
+}
+[data-ats] .ats-scrollcue svg { width: 10px; height: 12px; shape-rendering: crispEdges; }
+[data-ats] .ats-chapter { margin: 0; }
+[data-ats] .ats-chapter-title {
+  font: italic 400 clamp(2rem, 1.4rem + 2vw, 3rem)/1.05 var(--font-accent);
+  color: var(--line); letter-spacing: 0;
+}
+[data-ats] .ats-chapter-no { display: block; font: 500 0.875rem/1 var(--font-story); letter-spacing: 0.08em; margin-bottom: 0.6em; color: var(--text); }
+[data-ats] .ats-endcard { display: flex; gap: 24px; align-items: baseline; flex-wrap: wrap; }
+[data-ats] .ats-endcard.is-active { pointer-events: auto; }
+[data-ats] .ats-endcard a { font: italic 1.5rem/1.2 var(--font-accent); color: var(--line); padding: 10px 0; }
 
-/* mobile: a bottom sheet below the art */
-[data-ats] .ats-sheet {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: var(--sheet-h, 34svh);
-  padding: 20px var(--gutter) calc(76px + env(safe-area-inset-bottom));
-  background: var(--cloud);
-  border-top: 2px solid var(--line);
-  display: flex; align-items: flex-start;
+[data-ats][data-layout='mobile'] {
+  --copy-left: max(20px, env(safe-area-inset-left));
+  --copy-top: calc(100svh - var(--sheet-h, 220px) + 18px);
+  --copy-w: calc(100vw - 40px);
 }
-[data-ats] .ats-sheet .ats-copy { font-size: max(20px, var(--story-size)); }
+[data-ats][data-layout='mobile'] .ats-copy { font-size: max(20px, min(23px, calc((100vw - 40px) / 16))); }
+[data-ats][data-layout='mobile'] .ats-cover h1 { font-size: clamp(2.5rem, 11vw, 3.25rem); }
 
-/* ── accent / UI ─────────────────────────────────────── */
-[data-ats] .ats-accent { font-family: var(--font-accent); font-style: italic; font-weight: 400; }
+/* ── interaction layer ──────────────────────────────── */
+[data-ats] .ats-hits { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
+[data-ats] .ats-hit {
+  position: absolute; left: 0; top: 0;
+  padding: 0; border: 0; background: transparent; border-radius: 6px;
+  pointer-events: auto; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+[data-ats] .ats-hit[hidden] { display: none; }
+[data-ats] .ats-hit--board, [data-ats] .ats-hit--scrub { cursor: grab; touch-action: none; }
+[data-ats] .ats-hit--board:active, [data-ats] .ats-hit--scrub:active { cursor: grabbing; }
+[data-ats] .ats-hit--hold { touch-action: none; border-radius: 999px; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 [data-ats] .ats-hint {
-  font-family: var(--font-accent); font-style: italic; font-size: 1.125rem; color: var(--line);
+  position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none;
+  font: italic 1.25rem/1 var(--font-accent); color: var(--line);
+  background: var(--cloud); padding: 3px 9px 5px; border-radius: 999px;
+  white-space: nowrap;
 }
+[data-ats] .ats-hint[hidden] { display: none; }
+[data-ats] .ats-ring { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; overflow: visible; }
+[data-ats] .ats-ring circle { fill: none; stroke: var(--line); transform: rotate(-90deg); transform-origin: 50% 50%; }
+[data-ats] .ats-ring .track { stroke-width: 3; opacity: 0.3; }
+[data-ats] .ats-ring .fill { stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p, 0)); }
+[data-ats] .ats-ring.is-holding .track { opacity: 0.55; }
 
+/* mobile: the old window, docked to the right edge, always in view */
+[data-ats] .ats-peripheral {
+  position: absolute; z-index: 5; margin: 0;
+  top: calc(64px + env(safe-area-inset-top)); right: 0;
+  border: 2px solid var(--line); border-right: 0;
+  background: var(--sky); line-height: 0;
+}
+[data-ats] .ats-periph-canvas { display: block; image-rendering: crisp-edges; image-rendering: pixelated; }
+
+/* ── chrome ─────────────────────────────────────────── */
 [data-ats] .ats-back {
   position: fixed; z-index: 20;
   left: calc(16px + env(safe-area-inset-left)); bottom: calc(16px + env(safe-area-inset-bottom));
@@ -89,32 +167,68 @@
   font-family: var(--font-accent); font-style: italic; font-size: 1.0625rem; line-height: 1;
   text-decoration: none;
 }
-[data-ats] .ats-back::after { content: ''; position: absolute; inset: -6px; } /* 48px touch target */
+[data-ats] .ats-back::after { content: ''; position: absolute; inset: -6px; }
 [data-ats] .ats-back svg { width: 14px; height: 14px; shape-rendering: crispEdges; }
-
 [data-ats] .ats-menu {
   position: fixed; z-index: 20;
   top: calc(8px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right));
   width: 48px; height: 48px; display: grid; place-items: center;
   border: 0; background: none; padding: 0; color: var(--line); cursor: pointer;
 }
-[data-ats] .ats-menu svg { width: 24px; height: 24px; shape-rendering: crispEdges; }
+[data-ats] .ats-menu svg { width: 26px; height: 26px; shape-rendering: crispEdges; background: var(--cloud); }
 
-/* mobile: the old window, docked to the right edge, always in view */
-[data-ats] .ats-peripheral {
-  position: fixed; z-index: 10;
-  top: calc(60px + env(safe-area-inset-top)); right: 0;
-  border: 2px solid var(--line); border-right: 0;
-  background: var(--sky);
-  line-height: 0;
+[data-ats] .ats-menu-panel {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0;
+  background: var(--line); color: var(--cloud);
 }
-[data-ats] .ats-peripheral svg { display: block; }
+[data-ats] .ats-menu-panel::backdrop { background: transparent; }
+[data-ats] .ats-menu-inner { min-height: 100%; padding: calc(72px + env(safe-area-inset-top)) var(--gutter) 96px; max-width: 900px; margin: 0 auto; }
+[data-ats] .ats-menu-head { font: italic 1.5rem/1 var(--font-accent); margin: 0 0 32px; }
+[data-ats] .ats-menu-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+[data-ats] .ats-menu-list a {
+  display: grid; grid-template-columns: 2.5ch 1fr auto; gap: 16px; align-items: baseline;
+  padding: 10px 0; color: var(--cloud); text-decoration: none;
+  font: 400 clamp(1.75rem, 1.2rem + 2vw, 2.75rem)/1.1 var(--font-story); letter-spacing: -0.02em;
+  border-bottom: 1.5px solid color-mix(in oklab, var(--cloud), transparent 70%);
+}
+[data-ats] .ats-menu-list .n { font: 500 0.875rem/1 var(--font-story); letter-spacing: 0.06em; }
+[data-ats] .ats-menu-list .s { font: italic 1.125rem/1 var(--font-accent); }
+[data-ats] .ats-menu-list a[data-state='read'] .s::after { content: attr(data-label-read); }
+[data-ats] .ats-menu-list a[data-state='current'] .s::after { content: attr(data-label-current); }
+[data-ats] .ats-menu-list a[data-state='next'] { opacity: 0.86; }
+[data-ats] .ats-menu-panel :focus-visible { outline-color: var(--cloud); }
+[data-ats] .ats-menu-foot { margin: 28px 0 0; font: italic 1.25rem/1 var(--font-accent); }
+[data-ats] .ats-menu-foot a { color: var(--cloud); padding: 10px 0; display: inline-block; }
+[data-ats] .ats-menu-close {
+  position: fixed; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right));
+  min-width: 48px; min-height: 48px; padding: 0 14px;
+  border: 1.5px solid var(--cloud); border-radius: 999px; background: none; color: var(--cloud);
+  font: italic 1.125rem/1 var(--font-accent); cursor: pointer;
+}
+
+/* ── credits ────────────────────────────────────────── */
+[data-ats] .ats-credits {
+  position: relative; z-index: 1;
+  background: var(--cloud); border-top: 2px solid var(--line);
+  padding: 72px var(--gutter) calc(120px + env(safe-area-inset-bottom));
+  font-size: 1rem; line-height: 1.5;
+}
+[data-ats] .ats-credits > * { max-width: 68ch; margin-left: auto; margin-right: auto; }
+[data-ats] .ats-credits h2 { font-size: 2.25rem; margin-top: 0; color: var(--line); font-weight: 400; }
+[data-ats] .ats-credits dl { display: grid; gap: 6px 24px; grid-template-columns: 9rem 1fr; }
+[data-ats] .ats-credits dt { font-weight: 500; }
+[data-ats] .ats-credits dd { margin: 0 0 12px; }
+[data-ats] .ats-credits a { color: var(--line); }
+@media (max-width: 640px) { [data-ats] .ats-credits dl { grid-template-columns: 1fr; } }
 
 [data-ats] .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 
-@media (min-width: 768px) {
-  [data-ats] { --story-size: clamp(1.75rem, 1rem + 1.2vw, 2.25rem); }
-}
+/* The host sets overflow-x: hidden on html/body, which turns <body> into a
+   scroll container and silently breaks position: sticky. While the story
+   is on the page, clip instead (no scroll container, same visual result). */
+/* (specificity raised past the host's html[data-thoughts]:has(.shell) rule) */
+html:has(body [data-ats][data-ats]), html:has(body [data-ats][data-ats]) body { overflow-x: clip; overflow-y: visible; }

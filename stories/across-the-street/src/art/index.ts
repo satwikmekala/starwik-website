@@ -23,9 +23,22 @@ import sofa from './sofa.ts'
 import tramPass from './tram-pass.ts'
 import windowArt from './window.ts'
 import wristband from './wristband.ts'
+import hallway from './hallway.ts'
+import man from './man.ts'
+import { marcus, marcusCrouch } from './marcus.ts'
+import phone from './phone.ts'
+import streetShellMobile from './street-shell-mobile.ts'
+import { bikes, fruitSeller, manSmall, oldWoman, womanDog } from './street-people.ts'
 
-export const SPRITES = [
+/** Needed for the first screen (chapter 1). */
+export const CORE = [
   flatShellDesktop, flatShellMobile, oldBuilding, cloud,
   windowArt, door, corkboard, tramPass, wristband, photo, postcard,
   sofa, lamp, coffeeTable, rug, plant, chair, dishcloth, breakfastTable, mug,
 ]
+/** Loaded after first paint (people, street, later chapters). */
+export const LATE = [
+  marcus, marcusCrouch, man, phone, hallway,
+  streetShellMobile, manSmall, fruitSeller, oldWoman, bikes, womanDog,
+]
+export const SPRITES = [...CORE, ...LATE]

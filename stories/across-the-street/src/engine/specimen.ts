@@ -3,7 +3,7 @@
  * live --distress slider, the type scale, every sprite and part, and both
  * Scene A compositions. Mounted with `?story=specimen`.
  */
-import { SPRITE_DATA } from '../art/compiled.ts'
+import { loadLateSprites, SPRITE_DATA } from '../art/compiled.ts'
 import { INKS } from '../art/palette.ts'
 import { flatDesktop, flatMobile } from '../scenes/flat.ts'
 import type { SceneDef } from '../scenes/types.ts'
@@ -51,7 +51,8 @@ function spriteFigure(name: string, part: string) {
 
 function sceneFigure(def: SceneDef, s: number, caption: string) {
   const { x, y, w, h } = def.safe
-  const markup = sceneMarkup(def, sunbeamMarkup(def, 0.12)).replace(/ data-hidden/g, ' style="display:none"').replace('class="ats-sunbeam"', 'opacity=".75"')
+  const still = { ...def, items: def.items.filter((i) => !['hallway', 'door-open', 'old-glint'].includes(i.id)) }
+  const markup = sceneMarkup(still, sunbeamMarkup(def, 0.12)).replace(/ data-hidden/g, ' style="display:none"').replace('class="ats-sunbeam"', 'opacity=".75"')
   return `<figure><svg xmlns="${SVG_NS}" viewBox="${x} ${y} ${w} ${h}" width="${w * s}" height="${h * s}" shape-rendering="crispEdges" role="img" aria-label="${caption}">` +
     `<rect x="0" y="0" width="${def.canvas.w}" height="${def.canvas.h}" fill="var(--sky)"/>${markup}</svg>` +
     `<figcaption class="note">${caption}</figcaption></figure>`
@@ -59,6 +60,9 @@ function sceneFigure(def: SceneDef, s: number, caption: string) {
 
 export function mountSpecimen(root: HTMLElement) {
   root.dataset.view = 'specimen'
+  let alive = true
+  loadLateSprites().then(() => { if (alive) render() })
+  const render = () => {
   const swatch = (ink: string) => `<div class="sw"><i style="background:var(--${ink})"></i><b>--${ink}</b><code data-hex="${ink}"></code></div>`
   const chapter = BEATS.chapters[0]
   const sprites = Object.entries(SPRITE_DATA)
@@ -88,6 +92,9 @@ export function mountSpecimen(root: HTMLElement) {
 
     <section aria-labelledby="t-sprites"><h2 id="t-sprites">Drawings (×${SCALE})</h2><div class="sheet">${sprites.join('')}</div></section>
   </main>`
+    queueMicrotask(() => hexes())
+  }
+  render()
 
   const ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!
   const toHex = (css: string) => {
@@ -102,14 +109,19 @@ export function mountSpecimen(root: HTMLElement) {
     el.textContent = toHex(getComputedStyle(probe).color)
     probe.remove()
   })
-  const input = root.querySelector<HTMLInputElement>('[data-distress]')!
-  const out = root.querySelector<HTMLOutputElement>('[data-distress-out]')!
-  const onInput = () => { root.style.setProperty('--distress', input.value); out.textContent = Number(input.value).toFixed(2); hexes() }
-  input.addEventListener('input', onInput)
+  const onInput = (e: Event) => {
+    const input = e.target as HTMLInputElement
+    if (!input.matches('[data-distress]')) return
+    root.style.setProperty('--distress', input.value)
+    root.querySelector('[data-distress-out]')!.textContent = Number(input.value).toFixed(2)
+    hexes()
+  }
+  root.addEventListener('input', onInput)
   hexes()
   return {
     destroy() {
-      input.removeEventListener('input', onInput)
+      alive = false
+      root.removeEventListener('input', onInput)
       root.replaceChildren()
       delete root.dataset.view
       delete root.dataset.ats

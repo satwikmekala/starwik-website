@@ -7,6 +7,10 @@ export default sprite('mug', 14, 12, 'a coffee mug', {
     r.box(0, 0, 10, 12, 'cloud')                                // body
     r.rect(2, 2, 6, 1, 'coffee')                                // coffee line at the rim
   },
+  falling: (r) => {
+    r.solid(r.mask().poly([[2, 5], [9, 1], [14, 9], [7, 12]]), 'cloud') // turning in the air
+    r.set(1, 2, 'coffee'); r.set(3, 0, 'coffee'); r.set(0, 4, 'coffee')
+  },
   tipped: (r) => {
     r.box(1, 0, 6, 6, null)                                     // handle, now on top
     r.box(0, 3, 12, 9, 'cloud')                                 // body on its side

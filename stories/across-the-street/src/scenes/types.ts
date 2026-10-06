@@ -1,5 +1,5 @@
 export interface Placement {
-  /** DOM id-ish handle the chapters will animate (`data-item`). */
+  /** Handle the renderer and chapters use (`itemState(id)`). */
   id: string
   sprite: string
   /** Parts to draw, in order. Defaults to ['base'] or the sprite's only part. */
@@ -12,7 +12,9 @@ export interface Placement {
   canvas?: boolean
   /** Mirror horizontally (same art, facing the other way). */
   flip?: boolean
-  /** Meaningful art gets a label; decoration stays aria-hidden. */
+  /** Desktop clouds: drift slowly with time (not under reduced motion). */
+  drift?: number
+  /** Meaningful art gets a label (used for the canvas description). */
   label?: string
 }
 
@@ -23,6 +25,8 @@ export interface SceneDef {
   items: Placement[]
   /** The sunbeam is drawn right after this item: over floor and rug, under window and furniture. */
   beamAfter?: string
-  /** Window glass in safe-frame units: where the sunbeam starts. */
+  /** Street people (the man pacing, the fruit seller…) are drawn right after this item. */
+  streetAfter?: string
+  /** Window glass in safe-frame units: where the sunbeam starts; `from`/`to` = far edge of the floor patch at progress 0/1. */
   sun?: { x: number; y: number; w: number; h: number; floorTop: number; floorBottom: number; from: number; to: number }
 }

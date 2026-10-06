@@ -1,7 +1,7 @@
 import { sprite } from './lib/sprite.ts'
 
-/** Desktop canvas 800×480; the composed (safe) frame is 640×360 at (80, 60). */
-export const DESKTOP = { w: 800, h: 480, safe: { x: 80, y: 60, w: 640, h: 360 } } as const
+/** Desktop canvas 800×520; the composed (safe) frame is 640×360 at (80, 80). */
+export const DESKTOP = { w: 800, h: 520, safe: { x: 80, y: 80, w: 640, h: 360 } } as const
 const X = DESKTOP.safe.x, Y = DESKTOP.safe.y
 
 /**
