@@ -30,6 +30,7 @@ export function Selector({ thoughts, active, view, onSelect }: SelectorProps) {
   const inArchive = view === 'archive'
   const interactive = view === 'archive' || view === 'portal'
   const activeEntry = thoughts.find((thought) => thought.slug === active)
+  const newestFirst = [...thoughts].reverse()
 
   const onKeyDown = (event: KeyboardEvent<HTMLOListElement>) => {
     const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End']
@@ -37,7 +38,7 @@ export function Selector({ thoughts, active, view, onSelect }: SelectorProps) {
     const current = links.current.findIndex((link) => link === document.activeElement)
     if (current === -1) return
     event.preventDefault()
-    const last = thoughts.length - 1
+    const last = newestFirst.length - 1
     const next =
       event.key === 'Home'
         ? 0
@@ -57,8 +58,8 @@ export function Selector({ thoughts, active, view, onSelect }: SelectorProps) {
       data-interactive={interactive || undefined}
     >
       <ol className={styles.list} onKeyDown={onKeyDown}>
-        {thoughts.map((thought, index) => {
-          const stroke = selectorStroke(index)
+        {newestFirst.map((thought, index) => {
+          const stroke = selectorStroke(thought.index)
           const isActive = thought.slug === active
           return (
             <li

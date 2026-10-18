@@ -1,5 +1,5 @@
-/* The listening room — a room in the same house as /frequencies.
-   Tokens mirror .page in app/frequencies/frequencies.module.css; the room and
+/* The listening room — a room in the same house as /music.
+   Tokens mirror .page in app/music/frequencies.module.css; the room and
    dock live outside that page (they persist across routes), so they carry
    their own copy of the same values. */
 

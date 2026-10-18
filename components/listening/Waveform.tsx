@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type WaveSurfer from 'wavesurfer.js'
 
-import { formatTime, type Mix } from '@/app/frequencies/mixes'
+import { formatTime, type Mix } from '@/app/music/mixes'
 import { useListening } from './context'
 import styles from './listening.module.css'
 

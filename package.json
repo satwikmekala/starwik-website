@@ -8,7 +8,14 @@
     "start": "next start",
     "lint": "eslint",
     "mix:peaks": "node scripts/mix-peaks.mjs",
-    "mix:test-pressing": "node scripts/test-pressing.mjs"
+    "mix:test-pressing": "node scripts/test-pressing.mjs",
+    "thoughts:test-geometry": "node --test scripts/test-portal-geometry.mjs",
+    "thoughts:test-motion": "node --test scripts/test-thought-choreography.mjs",
+    "thoughts:test-scenes": "node --test scripts/test-scene-progress.mjs",
+    "story:art": "node --experimental-strip-types --no-warnings stories/across-the-street/scripts/compile-art.ts",
+    "story:beats": "node --experimental-strip-types --no-warnings stories/across-the-street/scripts/check-beats.ts",
+    "story:fonts": "stories/across-the-street/scripts/subset-fonts.sh",
+    "story:og": "node --experimental-strip-types --no-warnings stories/across-the-street/scripts/og-image.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

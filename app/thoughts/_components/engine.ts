@@ -20,6 +20,7 @@ export interface EngineElements {
   title: HTMLElement | null
   rig: HTMLElement | null
   shadow: HTMLElement | null
+  artifact: HTMLElement | null
 }
 
 /** the card's resting attitude — a sheet hanging slightly off-true */
@@ -54,7 +55,9 @@ class Spring {
 const SETTLE = { stiffness: 260, damping: 32.2 }
 
 export class DepthEngine {
-  private els: EngineElements = { backdrop: null, title: null, rig: null, shadow: null }
+  private els: EngineElements = { backdrop: null, title: null, rig: null, shadow: null, artifact: null }
+  private finePointer = window.matchMedia('(hover: hover) and (pointer: fine)')
+  private reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
   private mode: EngineMode = 'off'
   private raf = 0
   private last = 0
@@ -86,6 +89,9 @@ export class DepthEngine {
 
   attach(els: Partial<EngineElements>) {
     Object.assign(this.els, els)
+    // A replacement renderer inherits the current pose, including a reader's
+    // lifted paper pose, before the next choreography measures its geometry.
+    this.write()
   }
 
   setMode(mode: EngineMode) {
@@ -236,8 +242,11 @@ export class DepthEngine {
     const resting = [this.bgX, this.bgY, this.tX, this.tY, ...cardSprings].every(
       (spring) => spring.resting
     )
-    // the card keeps breathing while it floats; everything else sleeps once still
-    if (this.mode === 'portal' || !resting) this.raf = requestAnimationFrame(this.tick)
+    // Paper keeps its existing float. A static mobile/reduced-motion artifact
+    // lets this same loop sleep once the room's springs have come to rest.
+    const floating = this.mode === 'portal' &&
+      (!this.els.artifact || (this.finePointer.matches && !this.reducedMotion.matches))
+    if (floating || !resting) this.raf = requestAnimationFrame(this.tick)
   }
 
   private finishSettle() {
@@ -256,7 +265,7 @@ export class DepthEngine {
   }
 
   private write() {
-    const { backdrop, title, rig, shadow } = this.els
+    const { backdrop, title, rig, shadow, artifact } = this.els
     const f = this.float.value
     const floatY = f * 4 * Math.sin((this.clock / 7.2) * Math.PI * 2)
     const floatZ = f * 0.16 * Math.sin((this.clock / 11.3) * Math.PI * 2 + 1.1)
@@ -266,6 +275,20 @@ export class DepthEngine {
     }
     if (title) {
       title.style.transform = `translate3d(${this.tX.value.toFixed(2)}px, ${this.tY.value.toFixed(2)}px, 0)`
+    }
+    // Architecture borrows the room's damped drift, never the paper's pose.
+    // One transform write; no layout reads, additional loop, or touch tilt.
+    if (artifact) {
+      artifact.style.transform = this.finePointer.matches && !this.reducedMotion.matches
+        ? `translate3d(0, ${(floatY * 0.22).toFixed(2)}px, 0) ` +
+          `rotateX(${(this.bgY.value * 0.045).toFixed(3)}deg) ` +
+          `rotateY(${(-this.bgX.value * 0.075).toFixed(3)}deg)`
+        : ''
+      // The room behind the window borrows these same damped springs. CSS
+      // gates their use to focused desktop state and controls the small gain.
+      const interiorActive = this.mode === 'portal' && this.finePointer.matches && !this.reducedMotion.matches
+      artifact.style.setProperty('--house-look-x', interiorActive ? Math.max(-1, Math.min(1, -this.bgX.value / 9)).toFixed(4) : '0')
+      artifact.style.setProperty('--house-look-y', interiorActive ? Math.max(-1, Math.min(1, -this.bgY.value / 6)).toFixed(4) : '0')
     }
     if (rig) {
       rig.style.transform =

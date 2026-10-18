@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MotionConfig, useReducedMotion } from 'framer-motion'
 
-import { mixes, type Mix } from '@/app/frequencies/mixes'
+import { mixes, type Mix } from '@/app/music/mixes'
 import { ENTRY_ID, Listening, type ListeningContext, type Origin, type View } from './context'
 import { useAudioPlayer } from './useAudioPlayer'
 import { usePlatter } from './usePlatter'
@@ -16,7 +16,7 @@ type HistoryMark = {
   listeningDepth?: number
 }
 
-const ROOM_PATH = '/frequencies'
+const ROOM_PATH = '/music'
 
 function urlFor(view: View, slug?: string) {
   if (window.location.pathname !== ROOM_PATH) return undefined
@@ -142,7 +142,7 @@ export function ListeningRoomProvider({ children }: { children: React.ReactNode 
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
-  // a shared link — /frequencies?mix=vol-03 — opens straight into the player
+  // a shared link — /music?mix=vol-03 — opens straight into the player
   useEffect(() => {
     if (window.location.pathname !== ROOM_PATH) return
     const slug = new URLSearchParams(window.location.search).get('mix')

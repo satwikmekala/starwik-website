@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { formatReleased, formatTime, type Mix } from '@/app/frequencies/mixes'
+import { formatReleased, formatTime, type Mix } from '@/app/music/mixes'
 import { cx, useListening } from './context'
 import { Press, PressLink } from './Press'
 import { Vinyl } from './Vinyl'

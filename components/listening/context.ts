@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react'
 import type { MotionValue } from 'framer-motion'
 
-import type { Mix } from '@/app/frequencies/mixes'
+import type { Mix } from '@/app/music/mixes'
 import type { AudioPlayer } from './useAudioPlayer'
 
 export type View = 'closed' | 'browse' | 'player'

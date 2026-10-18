@@ -9,7 +9,7 @@
 import type { Ref } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
-import type { ThoughtEntry } from '@/content/thoughts/helpers'
+import { getPortalKind, type ThoughtEntry } from '@/content/thoughts/helpers'
 import { hrefs } from './scene'
 import styles from './archive.module.css'
 
@@ -58,7 +58,7 @@ export function ArchiveTitle({ thought, interactive, ref }: ArchiveTitleProps) {
   )
 
   return (
-    <div ref={ref} className={styles.titleWrap}>
+    <div ref={ref} className={styles.titleWrap} data-portal-kind={thought && getPortalKind(thought) === 'house' ? 'house' : undefined}>
       <div className={styles.titleStage}>
         <AnimatePresence initial={false}>
           <motion.div

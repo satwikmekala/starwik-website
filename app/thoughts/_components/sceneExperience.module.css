@@ -1,0 +1,89 @@
+.experience { background: #e8d3ac; padding-bottom: 0; }
+.story { position: relative; padding: 2rem clamp(1.35rem, 4vw, 4rem) clamp(6rem, 14vh, 10rem); background: #eee5d6; }
+.story::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 14svh; background: linear-gradient(transparent, #eee5d6); pointer-events: none; }
+.tools { display: flex; align-items: start; justify-content: space-between; gap: 1rem; max-width: 1160px; margin: 0 auto 2rem; font-family: var(--th-mono); font-size: .65rem; letter-spacing: .08em; color: var(--th-ink-soft); }
+.tools button, .return { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; text-underline-offset: .3em; cursor: pointer; }
+.contents summary { cursor: pointer; }
+.contents nav { display: grid; gap: .8rem; margin: 1.2rem 0; }
+.contents a { color: inherit; text-decoration: none; line-height: 1.5; }
+.tools :is(a, button, summary):focus-visible, .return:focus-visible { outline: 1px solid currentColor; outline-offset: 5px; }
+.layout { display: grid; grid-template-columns: minmax(180px, .8fr) minmax(0, 40rem); gap: clamp(2rem, 5vw, 5rem); max-width: 1160px; margin: 0 auto; align-items: stretch; }
+.visualRail { min-width: 0; }
+.visual { position: sticky; top: 14svh; height: min(65svh, 620px); overflow: hidden; background: #c6a67e; }
+.surface { position: absolute; inset: 0; opacity: 0; transition: opacity 650ms ease; background: #c6a67e; }
+.surface[data-visible='true'] { opacity: 1; }
+.surface::after { content: ''; position: absolute; inset: 0; background: linear-gradient(145deg, #ffffff12, transparent 50%, #0000000c); }
+.surface[data-theme='cool'] { background: #a1abb0; }
+.surface[data-theme='dim'] { background: #686663; }
+.surface[data-theme='muted'] { background: #8b8070; }
+.surface[data-theme='dark'] { background: #4e5357; }
+.surface[data-theme='soft'] { background: #aaa197; }
+.surface[data-theme='warming'] { background: #c7ad85; }
+.surface[data-theme='calm'] { background: #b7b6a1; }
+.visual[data-transition='fade'] .surface { transition-duration: 280ms; }
+.visual[data-transition='cut'] .surface { transition: none; }
+.visualCaption { position: absolute; left: 1.5rem; bottom: 1.4rem; margin: 0; padding: .4rem .6rem; background: #eee5d6; color: #302a24; font: .6rem var(--th-mono); letter-spacing: .18em; }
+.text { width: 100%; min-width: 0; padding-top: 0; }
+.section { display: flow-root; padding: 1rem 0 2.5rem; }
+.section > h2 { margin-top: 0; scroll-margin-top: 12svh; }
+.debug { position: fixed; bottom: 1rem; left: 1rem; z-index: 30; padding: .6rem; background: #211c17; color: #eee5d6; font: 11px monospace; pointer-events: none; }
+.fallback { position: relative; z-index: 7; background: var(--th-paper); }
+.return { position: fixed; top: 1.75rem; right: 1.4rem; z-index: 22; padding: .4rem; background: var(--th-paper); color: var(--th-ink-soft); font: .65rem var(--th-mono); }
+@media (max-width: 767px), (max-height: 500px) {
+  .layout { display: block; position: relative; max-width: 40rem; }
+  .tools { max-width: 40rem; }
+  /* A quiet rail beside the words, not a pinned panel consuming phone space. */
+  .visualRail { position: absolute; top: 0; bottom: 0; left: -1rem; width: 3px; }
+  .visual { top: 12svh; height: 76svh; }
+  .visualCaption { display: none; }
+  .text { position: relative; }
+  .section { padding-bottom: 1.8rem; }
+  .tools { font-size: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) { .surface { transition: none !important; } }
+
+.simpleOpening { min-height: 55svh; display: grid; place-items: center; padding: 5rem 1.35rem; text-align: center; }
+.simpleOpening h1 { font-size: clamp(3rem, 8vw, 7rem); font-style: italic; font-weight: 300; line-height: 1; outline: none; }
+
+/* Sunday is the first authored consumer. Future stories retain the base layout. */
+.experience[data-sunday-opening] .layout { max-width: 1480px; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(2rem, 4vw, 4.5rem); }
+.experience[data-sunday-opening] .tools { max-width: 1480px; }
+.experience[data-sunday-opening] .story { isolation: isolate; background: radial-gradient(ellipse 72% 38% at 78% 0%, #fff4ca66 0, #f5c9762b 31%, transparent 70%), linear-gradient(180deg, #f4dfba 0, var(--scene-bg, #eee5d6) 13rem); }
+.experience[data-sunday-opening] .story::before { height: min(26svh, 17rem); background: radial-gradient(ellipse 52% 100% at 78% 100%, #ffe8b685 0, #f7cb7a3b 39%, transparent 75%); filter: blur(3px); }
+.experience[data-sunday-opening] .tools, .experience[data-sunday-opening] .layout, .experience[data-sunday-opening] .end { position: relative; z-index: 1; }
+.experience[data-sunday-opening] .visual { height: auto; width: min(100%, 96svh); margin-inline: auto; aspect-ratio: 6 / 5; top: max(4rem, calc((100svh - 50vw) / 2)); max-height: 80svh; }
+.surface[data-illustrated]::after { display: none; }
+.experience[data-sunday-opening] .visual:has(.surface[data-illustrated][data-visible='true']) .visualCaption { display: none; }
+.quietBeat { padding: .8em 0 .65em; }
+@media (max-width: 767px), (max-height: 500px) {
+  .experience[data-sunday-opening] .story::before { height: 2rem; }
+  /* The opening illustration flows into full-width prose. Keep the engine's
+     three-pixel placeholder rail without changing document geometry on entry. */
+  .experience[data-sunday-opening] .visual { position: sticky; top: 12svh; height: 76svh; aspect-ratio: auto; max-height: none; }
+  .experience[data-sunday-opening] .surface[data-illustrated] > * { display: none; }
+}
+
+/* Chapter grammar. Palette writes never change layout geometry or font metrics. */
+.experience { background: var(--scene-bg, #eee5d6); color: var(--scene-text, #302b23); }
+.story { background: transparent; }
+.story::before { background: linear-gradient(transparent, var(--scene-bg, #eee5d6)); }
+.text, .chapterTitle h2, .tools { color: inherit; }
+.atmosphere { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+.atmosphere::before, .atmosphere::after { content: ''; position: absolute; inset: 0; }
+.atmosphere::before { background: radial-gradient(ellipse at 60% 40%, transparent 35%, var(--scene-shadow, #665b45)); opacity: var(--scene-vignette, 0); }
+.atmosphere::after { background: repeating-linear-gradient(0deg, transparent 0 3px, #33404b55 3px 4px), repeating-linear-gradient(93deg, transparent 0 5px, #fff9df77 5px 6px); opacity: var(--scene-grain, .025); }
+.chapterTitle h2 { margin-top: 0; scroll-margin-top: 12svh; }
+.section[data-chapter-intro] { padding-top: 0; }
+.section[data-chapter-intro] .chapterTitle { min-height: 52svh; display: flex; flex-direction: column; justify-content: center; padding: 7svh 0 10svh; }
+.section[data-chapter-intro] .chapterTitle h2 { margin: 0; font-size: 1.55em; font-weight: 400; }
+.section[data-density='tight'] .chapterTitle { min-height: 40svh; }
+.section[data-density='open'][data-chapter-intro] .chapterTitle { min-height: 62svh; }
+.chapterProse { opacity: 1; transition: opacity 450ms ease; }
+.section[data-chapter-intro][data-phase='intro'] .chapterProse { opacity: .78; }
+.inlineVisual { display: none; }
+@media (max-width: 767px), (max-height: 500px) {
+  .section[data-chapter-intro] .chapterTitle { min-height: 0; padding: 3rem 0 4rem; }
+  .section[data-chapter-intro] .chapterTitle h2 { margin-top: 2.5rem; font-size: 1.5em; }
+  .inlineVisual { display: block; position: relative; width: 100%; aspect-ratio: 6 / 5; --scene-focus: 1; --scene-light: .66; }
+}
+@media (prefers-reduced-motion: reduce) { .chapterProse { transition: none; } }

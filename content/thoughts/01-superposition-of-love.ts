@@ -1,102 +1,189 @@
 import type { Thought } from './types'
 
-/*
- * PLACEHOLDER COPY — written to exercise the reading experience
- * (paragraphs, headings, quotes, a break, a wide photograph, the ending).
- * Replace every word with your own.
+/**
+ * The Quantum Superposition of Love — originally published November 12, 2025.
+ * https://starwik.substack.com/p/the-quantum-superposition-of-love
+ * Original paragraphs, headings, quotes and image order are preserved below.
  */
-
 const thought: Thought = {
   slug: 'superposition-of-love',
+  accent: '#12234F',
   number: '01',
   title: 'superposition\nof love',
-  subtitle: 'maybe every universe is simply\nlooking for a way to touch.',
-  date: '2026-09',
+  subtitle: 'two quantum particles,\nentangled across spacetime.',
+  date: '2025-11-12',
   coverImage: {
-    // TEMPORARY — swap for the dusk / night photograph this thought belongs to
-    src: '/images/ext-clubroom.jpg',
-    alt: 'A dark room lit by a single red glow',
-    position: 'center 42%',
+    src: '/images/thoughts-midnight-notebook.jpg',
+    alt: 'Moonlight falling across handwritten pages on a dark desk',
+    position: 'center center',
+    mobilePosition: '62% center',
   },
   body: [
-    { type: 'heading', text: 'i. the many' },
     {
-      type: 'paragraph',
-      text: "There's an idea in physics I keep returning to, mostly because I don't fully understand it. Before anything is observed, a particle isn't here or there. It's in every place it could be at once — a smear of possibilities, each one real enough to interfere with the others. Only when something looks does it settle into a single answer.",
+      type: "paragraph",
+      text: "As we float on a rock through this absurd cosmic ocean, there is one specific soul quietly moving toward intersecting with mine. When I asked myself who this person could be, I realized something strange: right now, my future partner exists in a quantum superposition. She’s not yet a person but a probability cloud, at least not until something collapses her into one specific reality.",
     },
     {
-      type: 'paragraph',
-      text: "I'm not a physicist. I'm someone who reads the first half of articles about physics at two in the morning and then lies awake with them. But this one stayed, because it describes something I'd already felt long before I had a word for it: meeting someone and sensing, underneath the small talk, every version of the two of you that could happen.",
+      type: "image",
+      src: "/images/thoughts/superposition-of-love/01.jpg",
+      alt: "Two glowing figures reaching toward each other beneath a star-filled sky",
+      width: "column",
+      aspectRatio: "1568 / 1920",
     },
     {
-      type: 'paragraph',
-      text: "Strangers at a party. A friend of a friend at the edge of a dance floor. You say something about the music; they laugh at the wrong part of the sentence. And for a moment the air is crowded — with the version where you never speak again, the version where you do, the one where it's a single perfect night and the one where it's ten years and a shared kitchen. All of them present. None of them chosen.",
+      type: "heading",
+      text: "The Physics of Possibility",
+      id: "the-physics-of-possibility",
     },
     {
-      type: 'quote',
-      text: 'every almost is still an entire world somewhere.',
-      cite: 'a note on my phone, 3:14 am',
+      type: "paragraph",
+      text: "In quantum mechanics, particles don’t exist in one definite state until they’re observed. Before observation, they exist in superposition, occupying multiple states simultaneously. Schrödinger’s famous thought experiment made this clear: a cat in a box exists as both alive and dead until someone opens it, collapsing the wave function into one reality. It sounds kinda absurd, but this is precisely how the universe operates at quantum scales.",
     },
     {
-      type: 'paragraph',
-      text: "I think that crowded feeling is what we mean when we say *chemistry*. It isn't certainty. It's the opposite. It's standing inside all the possibilities at once and feeling how much each of them weighs.",
-    },
-    { type: 'heading', text: 'ii. the collapse' },
-    {
-      type: 'paragraph',
-      text: "The trouble with superposition is that it can't last. Look, and it's gone. The particle picks a place, and every other place it might have been quietly stops being true.",
+      type: "quote",
+      text: "Now apply that framework to love.",
     },
     {
-      type: 'paragraph',
-      text: 'Love works like that too, I think. Choosing someone is an act of observation. You stop looking at everything the two of you could be and start looking at what you actually are — the specific laugh, the specific silence in the car, the specific way they leave cupboard doors open. The cloud collapses into a person. And a person is so much smaller than a possibility, and so much more real.',
+      type: "paragraph",
+      text: "Your future partner isn’t a fixed point on a map, waiting to be discovered. She’s a wave function spread across infinite timelines, every possible version of how you might meet, every variation of circumstances that could bring you together, all existing at once in a state of pure probability. Each choice you make acts as a quantum gate, collapsing some possibilities while opening others.",
     },
     {
-      type: 'paragraph',
-      text: "For a long time I was scared of that collapse. I liked the crowded air. Almosts are safe; nothing that never happened can disappoint you. I stayed in superposition with people for months — texting at the edge of meaning, never saying the sentence that would make it one thing or another. I told myself I was keeping my options open. Mostly I was keeping myself from being seen.",
+      type: "paragraph",
+      text: "But the thing is, it doesn’t just end with only your choices.",
     },
     {
-      type: 'image',
-      // TEMPORARY photograph
-      src: '/images/ext-moonshine.jpg',
-      alt: 'A hand reaching across the decks toward the DJ during an afternoon set',
-      caption: 'a hand, reaching across the booth.',
-      width: 'wide',
-      aspectRatio: '16 / 9',
-      position: 'center 40%',
+      type: "paragraph",
+      text: "In quantum entanglement, two particles become correlated in such a way that measuring one instantly affects the other, regardless of distance. Einstein called it “spooky action at a distance,” and hated it because it didn't apply true to his general theory of relativity. But he was wrong. It’s actually real.",
     },
     {
-      type: 'paragraph',
-      text: "Playing music taught me something about this, strangely. Before a set, every track in my bag is possible. The night could go anywhere. It's thrilling and it's useless — a set that stays possible is just a folder of files. The magic only starts when I commit to one record, and then another, and let each choice close a hundred doors so that one room can open. Nobody dances to what I could play. They dance to what I play.",
-    },
-    { type: 'heading', text: 'iii. the touch' },
-    {
-      type: 'paragraph',
-      text: "Here is the part I can't prove, and don't need to. I don't think the other versions disappear. I think they go on somewhere — in universes stacked so close to ours that we can feel them on quiet nights, a kind of pressure behind the air. In one of them we never met. In one of them we met too early and ruined it. In one of them it's still that first night, and the song hasn't ended.",
+      type: "paragraph",
+      text: "Extending this framework, you and your future partner are already entangled, even if you haven’t met. Every decision you make ripples through probability space, and so do hers. When you quit that job that was quietly draining your aliveness, maybe that single act of courage shifted the coordinates of your life just enough for her path to start bending toward yours. When she finally walked away from a relationship that had long stopped growing, maybe that decision opened the exact timeline where your worlds begin to overlap.",
     },
     {
-      type: 'paragraph',
-      text: 'And in all of them — this is the part that undoes me — something is reaching. Two hands, a few centimetres apart, in every configuration the world allows. Some of them touch. Most of them don\'t. The reaching is the constant. The reaching is the one thing that is true in every version.',
+      type: "paragraph",
+      text: "These aren’t isolated events; they’re entangled movements, tugging invisibly on the fabric of possibility, pulling your probability waves closer together without either of you knowing it.",
     },
     {
-      type: 'quote',
-      text: "we are not the only pair of hands. we're just the pair that got here.",
+      type: "image",
+      src: "/images/thoughts/superposition-of-love/02.jpg",
+      alt: "People facing colorful mirrors with rippling reflections",
+      width: "column",
+      aspectRatio: "939 / 1026",
     },
     {
-      type: 'paragraph',
-      text: 'Maybe that is what love is, underneath all the stories we tell about it. Not fate — fate is too tidy. Just the stubborn, universal fact of reaching. A tendency written into everything that exists to lean toward something else. Gravity with feelings. Particles with a longing they cannot name.',
-    },
-    { type: 'break' },
-    {
-      type: 'paragraph',
-      text: "I don't know how this ends. That's the honest answer, and I've learned to be less afraid of it. Every morning the possibilities come back, crowded and loud, and every day I get to choose which one to look at. Some days I choose badly. Some days I look away entirely. But I keep choosing, and each time I do, somewhere in the stack of worlds, a door closes and a room opens.",
+      type: "heading",
+      text: "But Here’s What We Miss",
+      id: "but-heres-what-we-miss",
+      level: 3,
     },
     {
-      type: 'paragraph',
-      text: "So I'll leave the other versions where they are. I hope they're kind to each other. I hope some of them are dancing.",
+      type: "quote",
+      text: "She isn’t the only one in superposition. **You are too.**",
     },
     {
-      type: 'paragraph',
-      text: "And I'll stay here, in the one where I'm writing this down, still reaching — because *maybe every universe is simply looking for a way to touch.*",
+      type: "paragraph",
+      text: "You are not who you were a year ago. Your neural pathways have literally rewired. You’ve accumulated experiences that altered you at the cellular level. You are fundamentally a different person today.",
+    },
+    {
+      type: "paragraph",
+      text: "Think of it like frequency. Right now, you vibrate at a particular pitch, determined by your self-awareness, your healed and unhealed traumas, your capacity for vulnerability, your ability to see people clearly rather than through the distorted lens of your own needs. This frequency which is invisible but real, attracts people who match it’s vibration or complement it.",
+    },
+    {
+      type: "paragraph",
+      text: "If you meet someone today, you will attract someone who resonates with your current state and your current subconscious patterns. Someone who matches where you are now, with all your present strengths and limitations.",
+    },
+    {
+      type: "paragraph",
+      text: "But when you do the necessary work by healing your old wounds, pruning away patterns that no longer serve you, becoming more integrated into your true self, your frequency shifts. You begin radiating something shaped by effort and honesty, and the people you attract shift accordingly.",
+    },
+    {
+      type: "paragraph",
+      text: "Not because these new people are objectively better humans, but because they’re more aligned with who you actually are. You’ll start attracting that person you probably couldn’t have even recognized as right for you in your previous state, because you lacked the wisdom to see them clearly.",
+    },
+    {
+      type: "paragraph",
+      text: "The quantum field responds to who you actually are, not who you wish you were. Change your frequency, and you change the probability of who collapses into your reality.",
+    },
+    {
+      type: "image",
+      src: "/images/thoughts/superposition-of-love/03.jpg",
+      alt: "A person reaching toward a bright star in a blue cosmic sky",
+      width: "column",
+      aspectRatio: "1536 / 1920",
+      // The optimized response stalls for this JPEG; its original renders correctly.
+      unoptimized: true,
+    },
+    {
+      type: "heading",
+      text: "So What Do You Actually Do With This?",
+      id: "so-what-do-you-actually-do-with-this",
+    },
+    {
+      type: "paragraph",
+      text: "We put unnecessary pressure on ourselves about whether we’ll ever find the right person. We get tired of waiting and attract the wrong people, thinking they’re right, frustrated by how complicated it all seems.",
+    },
+    {
+      type: "paragraph",
+      text: "But physics and philosophy together teach us something very important :",
+    },
+    {
+      type: "quote",
+      text: "stop worrying about the collapse.",
+    },
+    {
+      type: "paragraph",
+      text: "The quantum field operates according to laws far deeper than your conscious will. Your job isn’t to force the wave function in any particular direction. That’s not within your power, and trying will only make you miserable.",
+    },
+    {
+      type: "quote",
+      text: "Your job is much simpler: to become.",
+    },
+    {
+      type: "paragraph",
+      text: "The only thing you control is your own internal state, which directly shapes your external reality.",
+    },
+    {
+      type: "paragraph",
+      text: "Keep evolving. Keep expanding into the fullest, most honest expression of who you actually are. This means building a life that feels alive - work that challenges you, creativity that makes you lose track of time. Learning to find stillness in solitude, meeting discomfort with curiosity instead of resistance, reflecting deeply, giving your thoughts the quiet they need to become wisdom, and staying open enough for life to surprise you.",
+    },
+    {
+      type: "paragraph",
+      text: "You’re not preparing yourself for her. You’re becoming someone you respect, someone who can show up fully in any relationship because you’ve learned to show up for yourself.",
+    },
+    {
+      type: "image",
+      src: "/images/thoughts/superposition-of-love/04.jpg",
+      alt: "A person walking toward a doorway filled with stars in a sunlit rocky landscape",
+      width: "column",
+      aspectRatio: "1920 / 1920",
+    },
+    {
+      type: "heading",
+      text: "The Inevitable Moment",
+      id: "the-inevitable-moment",
+    },
+    {
+      type: "paragraph",
+      text: "And when that wave function finally does collapse, when you meet whoever you’re meant to meet, it won’t feel so random. It will feel inevitable, as if every choice you made, every path you walked, every version of yourself that ever existed was conspiring toward that very exact moment.",
+    },
+    {
+      type: "paragraph",
+      text: "Not because fate predetermined it, but because you became the kind of person who could recognize and receive that particular kind of love.",
+    },
+    {
+      type: "paragraph",
+      text: "So I stand here now, suspended in infinite possibilities. Until the moment of collapse arrives, we both exist in superposition, infinite versions of our futures simultaneously real and unreal. Two quantum particles, entangled across spacetime, hovering between potential and actuality.",
+    },
+    {
+      type: "quote",
+      text: "And perhaps that’s exactly where we need to be.",
+    },
+    {
+      type: "image",
+      src: "/images/thoughts/superposition-of-love/05.jpg",
+      alt: "A couple lying together beneath Earth and glowing heart-shaped stars",
+      width: "column",
+      aspectRatio: "1658 / 1920",
     },
   ],
 }

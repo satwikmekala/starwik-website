@@ -216,7 +216,8 @@
 
 @media (max-width: 768px) {
   .heroImage {
-    object-position: 35% 25%;
+    /* Keep the DJ on the right third of the narrow, portrait crop. */
+    object-position: 65% 25%;
   }
 }
 
@@ -272,15 +273,11 @@
   align-items: flex-end;
   gap: 0.5em;
   /* trailing letter-spacing would hold the last glyph off the logo's right edge */
-  margin: 0.35rem -0.26em 2.05rem 0;
+  margin: 0.1rem -0.26em 2.05rem 0;
   font-size: clamp(0.5rem, 1.2vw, 0.58rem);
   letter-spacing: 0.26em;
   text-transform: uppercase;
   white-space: nowrap;
-}
-
-.heroRole {
-  color: var(--text-sec);
 }
 
 .heroNowPlaying {
@@ -289,20 +286,17 @@
   color: rgba(240, 235, 227, 0.5);
 }
 
-/* From tablet up the logo is large enough for the meta block to sit on the
-   wordmark's own measured span: the "w" starts at 25.1% and the "k" ends at
-   86.41% of the logo box, so the role line fills exactly that width and
-   "mixing house" centres inside it. */
+/* From tablet up the logo is large enough for the mixing label to sit on the
+   wordmark's own measured span. */
 @media (min-width: 768px) {
   .heroMeta {
     width: calc(var(--hero-logo-w) * 0.6131);
     min-width: 0;
     align-items: center;
-    margin: 0.4rem 0 2.05rem calc(var(--hero-logo-w) * 0.1424);
+    margin: 0.1rem 0 2.05rem calc(var(--hero-logo-w) * 0.1424);
     font-size: calc(var(--hero-logo-w) * 0.0397);
   }
 
-  .heroRole,
   .heroNowPlaying {
     /* trim each line's trailing letter-space so glyphs define the edges */
     margin-right: -0.26em;
@@ -777,7 +771,15 @@
   object-fit: cover;
   object-position: center;
   filter: brightness(0.88);
-  transition: filter 0.3s ease;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.gigImageZoomed {
+  transform: scale(1.12);
+}
+
+.gigImageOddVision {
+  object-position: center 62%;
 }
 
 .gigCard:hover .gigRealImg {
@@ -788,8 +790,16 @@
   background: radial-gradient(ellipse 70% 60% at 45% 45%, #4a0a1e 0%, #1a0612 60%, #0c0508 100%);
 }
 
+.gigPhotoExtSaturday {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, #520814 0%, #1c060d 60%, #0b0508 100%);
+}
+
 .gigPhotoExtClubroom {
   background: radial-gradient(ellipse 70% 60% at 50% 45%, #400a1a 0%, #190611 60%, #0b0508 100%);
+}
+
+.gigPhotoOddVision {
+  background: radial-gradient(ellipse 70% 60% at 50% 50%, #5a0a14 0%, #1c060d 60%, #0b0508 100%);
 }
 
 .gigPhotoKrunklive {
@@ -872,18 +882,20 @@
 }
 
 .gigTag {
-  padding: 0.22rem 0.5rem;
-  border: 1px solid var(--border);
+  padding: 0.24rem 0.55rem;
+  border: 1px solid rgba(240, 235, 227, 0.24);
   border-radius: 100px;
-  color: var(--text-muted);
-  font-size: 0.38rem;
+  background: rgba(192, 25, 43, 0.07);
+  color: rgba(240, 235, 227, 0.68);
+  font-size: 0.42rem;
   letter-spacing: 0.12em;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
 .gigTag:hover {
-  border-color: rgba(192, 25, 43, 0.85);
-  color: rgba(192, 25, 43, 0.75);
+  border-color: rgba(232, 51, 74, 0.8);
+  background: rgba(192, 25, 43, 0.16);
+  color: var(--text);
 }
 
 .gigIg {
@@ -936,11 +948,13 @@
   flex-direction: row;
   gap: 0.85rem;
   overflow-x: auto;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-top: 8px;
   margin-top: -8px;
+  padding-right: 1.5rem;
   padding-bottom: 1rem;
 }
 
@@ -1356,15 +1370,12 @@
   }
 
   .mixesGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    overflow-x: unset;
-    padding-bottom: 0;
+    display: flex;
   }
 
   .mixCard {
-    flex: unset;
-    max-width: unset;
+    flex: 0 0 45vw;
+    max-width: 340px;
   }
 }
 
@@ -1417,6 +1428,14 @@
 
   .gigScroll {
     padding-right: 4rem;
+  }
+
+  .mixesGrid {
+    padding-right: 4rem;
+  }
+
+  .mixCard {
+    flex: 0 0 300px;
   }
 
   .statement {
@@ -1501,6 +1520,15 @@
 
   .gigScroll {
     padding-right: 8rem;
+  }
+
+  .mixesGrid {
+    padding-right: 8rem;
+  }
+
+  .mixCard {
+    flex: 0 0 380px;
+    max-width: 420px;
   }
 
   .gigVenue {

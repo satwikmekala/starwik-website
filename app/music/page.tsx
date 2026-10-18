@@ -32,6 +32,26 @@ const artistGenres = [
 
 const allGigs = [
   {
+    venue: 'ODD VISION',
+    event: 'INDIA TOUR',
+    location: 'HYD · 2026',
+    desc: "Opened for Toobris, a Berlin-based artist, on his India tour — presented by Odd Vision. I got to set the tone for the night, leaning into a groovy deep tech sound to ease the room in — rolling, hypnotic, and warm — all on a four-deck setup that gave me room to layer and stretch every transition.",
+    tags: ['DEEP TECH', 'MINIMAL HOUSE'],
+    photoClass: styles.gigPhotoOddVision,
+    image: '/images/oddvision.jpg',
+    imageClass: styles.gigImageOddVision,
+  },
+  {
+    venue: 'EXT SATURDAY NIGHT',
+    event: 'HAUS OF WHAT',
+    location: 'HYD · 2026',
+    desc: "A disco Saturday night, so I brought the remix energy back into my house set. It's been a while since I played tunes the crowd actually knows. I mixed them up with punchier basslines and deeper grooves and kept the whole set riding a high dance energy. I couldn't stop dancing behind the decks myself!",
+    tags: ['GROOVY HOUSE', 'REMIXES'],
+    photoClass: styles.gigPhotoExtSaturday,
+    image: '/images/ext-saturday-night.jpg',
+    imageClass: styles.gigImageZoomed,
+  },
+  {
     venue: 'ANTI-SOCIAL',
     event: 'WHATPARTY004',
     location: 'HYD · 2026',
@@ -48,6 +68,7 @@ const allGigs = [
     tags: ['MINIMAL', 'DEEP TECH', 'GROOVY HOUSE EDITS'],
     photoClass: styles.gigPhotoKrunklive,
     image: '/images/krunklive.jpg',
+    youtubeUrl: 'https://youtu.be/O8eprzpfJNo?si=UoFyTqwqNZ5FNFlv',
   },
   {
     venue: 'EXT CLUBROOM',
@@ -57,6 +78,7 @@ const allGigs = [
     tags: ['SPEED HOUSE', 'HARD HOUSE', 'TRANCE HOUSE'],
     photoClass: styles.gigPhotoExtClubroom,
     image: '/images/ext-clubroom.jpg',
+    instagramUrl: 'https://www.instagram.com/p/DcAoJEOmty6/?stkn=MW9rdXphdGVlbjd3dQ==',
   },
   {
     venue: 'EXT MOONSHINE',
@@ -119,6 +141,12 @@ const allGigs = [
 
 const mixes = [
   {
+    videoId: 'O8eprzpfJNo',
+    title: '★wik — Vol. 05',
+    meta: 'YOUTUBE · 2026',
+    desc: "My USB corrupted the moment I plugged it in, right before opening for MA-SHA at KRUNK Live. Aditi pulled up, we moved everything onto her drive, and something shifted once I started playing. Bouncy basslines, UK house, tracks I'd been sitting on for ages, even a Telugu track over a UKG tune. Almost a nightmare, ended up a beautiful night.",
+  },
+  {
     videoId: 'MtOWuSFrr9o',
     title: '★wik — Vol. 04',
     meta: 'YOUTUBE · 2026',
@@ -170,7 +198,9 @@ type GigCardProps = {
   tags: string[]
   photoClass: string
   image?: string
+  imageClass?: string
   instagramUrl?: string
+  youtubeUrl?: string
   wide?: boolean
 }
 
@@ -182,9 +212,14 @@ function GigCard({
   tags,
   photoClass,
   image,
+  imageClass,
   instagramUrl,
+  youtubeUrl,
   wide,
 }: GigCardProps) {
+  const externalUrl = instagramUrl ?? youtubeUrl
+  const externalLabel = youtubeUrl ? 'VIEW ON YOUTUBE' : 'VIEW ON INSTAGRAM'
+
   const cardContent = (
     <>
       {image ? (
@@ -194,7 +229,7 @@ function GigCard({
             alt={`${venue} — ${event}`}
             fill
             sizes="320px"
-            className={styles.gigRealImg}
+            className={cx(styles.gigRealImg, imageClass)}
           />
         </div>
       ) : (
@@ -216,19 +251,20 @@ function GigCard({
             </span>
           ))}
         </div>
-        {instagramUrl ? (
+        {externalUrl ? (
           <span className={styles.gigIg}>
-            <span className={styles.igIcon}>◈</span> VIEW ON INSTAGRAM →
+            <span className={styles.igIcon}>{youtubeUrl ? '▶' : '◈'}</span>{' '}
+            {externalLabel} →
           </span>
         ) : null}
       </div>
     </>
   )
 
-  if (instagramUrl) {
+  if (externalUrl) {
     return (
       <a
-        href={instagramUrl}
+        href={externalUrl}
         target="_blank"
         rel="noopener noreferrer"
         className={cx(styles.gigCard, wide && styles.baliCard, styles.gigCardLink)}
@@ -270,7 +306,7 @@ export default function FrequenciesPage() {
       <section className={styles.hero}>
         <div className={styles.heroPhoto} aria-hidden="true">
           <Image
-            src="/images/front page.JPG"
+            src="/images/frequencies-hero.jpg"
             alt=""
             fill
             priority={true}
@@ -289,7 +325,6 @@ export default function FrequenciesPage() {
             <WikLogo className={styles.heroNameLogo} aria-label="★wik" role="img" />
           </h1>
           <div className={styles.heroMeta}>
-            <span className={styles.heroRole}>Experience Curator</span>
             <span className={styles.heroNowPlaying}>
               <span className={styles.heroMetaDot} aria-hidden="true" />
               Mixing House

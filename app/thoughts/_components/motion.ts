@@ -38,8 +38,16 @@ const HOLD = 1e7
 export class Choreography {
   private animations = new Set<Animation>()
   private pending = new Set<() => void>()
+  private cleanups = new Set<() => void>()
   private fast = false
   private dead = false
+
+  get cancelled() { return this.dead }
+
+  onCleanup(cleanup: () => void) {
+    if (this.dead) cleanup()
+    else this.cleanups.add(cleanup)
+  }
 
   animate(
     el: Element | null | undefined,
@@ -98,13 +106,26 @@ export class Choreography {
   }
 
   release() {
+    if (this.dead) return
     this.dead = true
     this.animations.forEach((animation) => animation.cancel())
     this.animations.clear()
+    this.cleanups.forEach((cleanup) => cleanup())
+    this.cleanups.clear()
     Array.from(this.pending).forEach((done) => done())
   }
 }
 
 export function nextFrame(): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => resolve()))
+  if (document.hidden) return Promise.resolve()
+  return new Promise((resolve) => {
+    const done = () => {
+      cancelAnimationFrame(frame)
+      document.removeEventListener('visibilitychange', onVisibility)
+      resolve()
+    }
+    const onVisibility = () => { if (document.hidden) done() }
+    const frame = requestAnimationFrame(done)
+    document.addEventListener('visibilitychange', onVisibility)
+  })
 }

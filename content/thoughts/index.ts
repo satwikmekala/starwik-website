@@ -15,16 +15,16 @@ import type { Thought } from './types'
 
 import superpositionOfLove from './01-superposition-of-love'
 import theOrderOfOperations from './02-the-order-of-operations'
-import everythingIWasAlreadyCarrying from './03-everything-i-was-already-carrying'
-import whatsLeft from './04-whats-left'
+import sundayMorning from './03-sunday-morning'
+import theMonkILiveWith from './04-the-monk-i-live-with'
 import theComfortableVersion from './05-the-comfortable-version'
 import theLongWayHome from './06-the-long-way-home'
 
 export const THOUGHTS: Thought[] = [
   superpositionOfLove,
   theOrderOfOperations,
-  everythingIWasAlreadyCarrying,
-  whatsLeft,
+  sundayMorning,
+  theMonkILiveWith,
   theComfortableVersion,
   theLongWayHome,
 ]
@@ -37,3 +37,5 @@ export function getThought(slug: string) {
 
 export type { Thought, ThoughtBlock, ThoughtImage } from './types'
 export type { ThoughtEntry } from './helpers'
+export { getExperienceKind, getPortalKind } from './helpers'
+export { SUNDAY_MORNING_SCENE_IDS, type SundayMorningSceneId } from './03-sunday-morning'

@@ -20,7 +20,7 @@ import { hrefs } from './scene'
 import { handStroke } from './strokes'
 import styles from './reader.module.css'
 
-interface ReaderProps {
+export interface ReaderProps {
   thought: ThoughtEntry
   next: ThoughtEntry
   ref?: Ref<HTMLElement>
@@ -28,15 +28,13 @@ interface ReaderProps {
   entrance: boolean
 }
 
-/** *words* → <em>words</em>; nothing else is interpreted */
+/** Render the content model's emphasis as semantic elements. */
 function inline(text: string): ReactNode[] {
-  return text.split(/(\*[^*]+\*)/g).map((part, index) =>
-    part.length > 2 && part.startsWith('*') && part.endsWith('*') ? (
-      <em key={index}>{part.slice(1, -1)}</em>
-    ) : (
-      <Fragment key={index}>{part}</Fragment>
-    )
-  )
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>
+    if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>
+    return <Fragment key={index}>{part}</Fragment>
+  })
 }
 
 const IMAGE_SIZES = {
@@ -45,12 +43,14 @@ const IMAGE_SIZES = {
   full: '100vw',
 }
 
-function Block({ block, index }: { block: ThoughtBlock; index: number }) {
+export function ReaderBlock({ block, index }: { block: ThoughtBlock; index: number }) {
   switch (block.type) {
     case 'paragraph':
       return <p className={styles.paragraph}>{inline(block.text)}</p>
-    case 'heading':
-      return <h2 className={styles.heading}>{inline(block.text)}</h2>
+    case 'heading': {
+      const Heading = block.level === 3 ? 'h3' : 'h2'
+      return <Heading id={block.id} className={styles.heading}>{inline(block.text)}</Heading>
+    }
     case 'quote':
       return (
         <figure className={styles.quote}>
@@ -75,6 +75,7 @@ function Block({ block, index }: { block: ThoughtBlock; index: number }) {
               src={block.src}
               alt={block.alt}
               fill
+              unoptimized={block.unoptimized}
               sizes={IMAGE_SIZES[width]}
               className={styles.figureImage}
               style={{ objectPosition: block.position ?? 'center' }}
@@ -142,7 +143,7 @@ export function Reader({ thought, next, ref, entrance }: ReaderProps) {
 
         <div className={styles.body} data-reveal>
           {thought.body.map((block, index) => (
-            <Block key={index} block={block} index={index} />
+            <ReaderBlock key={index} block={block} index={index} />
           ))}
         </div>
 

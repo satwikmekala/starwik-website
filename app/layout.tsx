@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { WorldTransitionProvider } from '@/components/planets/WorldTransition'
 import { ListeningRoomProvider } from '@/components/listening/ListeningRoomProvider'
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ export default function RootLayout({
         `}</style>
       </head>
       <body>
-        <ListeningRoomProvider>{children}</ListeningRoomProvider>
+        <ListeningRoomProvider>
+          <WorldTransitionProvider>{children}</WorldTransitionProvider>
+        </ListeningRoomProvider>
       </body>
     </html>
   )

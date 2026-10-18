@@ -1,0 +1,340 @@
+/* ── HOME · THE WIKVERSE ──
+   One design px = --u. The landscape stage is 1440 × 900, portrait is
+   400 × 960; each scales to fit, so the composition never reflows. */
+
+.viewport {
+  --u: min(calc(100vw / 1440), calc(100svh / 900));
+  --stage-w: 1440;
+  --stage-h: 900;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  width: calc(var(--stage-w) * var(--u));
+  height: calc(var(--stage-h) * var(--u));
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .viewport {
+    --u: min(calc(100vw / 400), calc(100svh / 960));
+    --stage-w: 400;
+    --stage-h: 960;
+  }
+}
+
+/* ── BRAND ── */
+.brand {
+  position: absolute;
+  left: calc(var(--u) * 64);
+  top: calc(var(--u) * 44);
+  width: calc(var(--u) * 160);
+  height: calc(var(--u) * 80);
+  line-height: 0;
+  animation: fadeIn 1.4s ease 0.1s backwards;
+}
+
+.brand svg {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+}
+
+.brand:hover svg {
+  transform: scale(1.04) translateY(-2px);
+  filter: drop-shadow(0 0 15px rgba(255, 203, 42, 0.35));
+}
+
+.tag {
+  position: absolute;
+  right: calc(var(--u) * 64);
+  top: calc(var(--u) * 80);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: calc(var(--u) * 10);
+  font-size: max(9px, calc(var(--u) * 11));
+  letter-spacing: 0.45em;
+  white-space: nowrap;
+  animation: fadeIn 1.4s ease 0.35s backwards;
+}
+
+.tag span:first-child { color: #4c5058; }
+.tag span:last-child { color: #8a8f98; }
+
+@media (max-aspect-ratio: 1/1) {
+  .brand {
+    left: calc(var(--u) * 22);
+    top: calc(var(--u) * 34);
+    width: calc(var(--u) * 124);
+    height: calc(var(--u) * 62);
+  }
+
+  .tag {
+    left: calc(var(--u) * 26);
+    right: auto;
+    top: calc(var(--u) * 112);
+    align-items: flex-start;
+    gap: calc(var(--u) * 7);
+    font-size: max(9px, calc(var(--u) * 10));
+    letter-spacing: 0.24em;
+  }
+}
+
+/* ── VOYAGE LINE ── */
+.route {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  animation: fadeIn 3s ease 1s backwards;
+}
+
+.route path {
+  fill: none;
+  stroke: rgba(236, 231, 221, 0.2);
+  stroke-width: 1.4px;
+  stroke-dasharray: 0.5 7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.probe {
+  fill: #ffe3a0;
+}
+
+.probeHalo {
+  fill: rgba(255, 203, 42, 0.12);
+}
+
+.route[data-layout='tall'] { display: none; }
+
+@media (max-aspect-ratio: 1/1) {
+  .route[data-layout='wide'] { display: none; }
+  .route[data-layout='tall'] { display: block; }
+}
+
+/* ── WORLDS ── */
+.world {
+  position: absolute;
+  left: calc(var(--x) * var(--u));
+  top: calc(var(--y) * var(--u));
+  width: calc(var(--s) * var(--u));
+  height: calc(var(--s) * var(--u));
+  transform: translate(-50%, -50%);
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.7s ease, filter 0.7s ease;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .world {
+    left: calc(var(--mx) * var(--u));
+    top: calc(var(--my) * var(--u));
+    width: calc(var(--ms) * var(--u));
+    height: calc(var(--ms) * var(--u));
+  }
+}
+
+.world[data-dimmed] {
+  opacity: 0.42;
+  filter: saturate(0.6);
+}
+
+.parallax {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(
+    calc(var(--px, 0) * var(--depth) * var(--u)),
+    calc(var(--py, 0) * var(--depth) * var(--u)),
+    0
+  );
+}
+
+.arrive {
+  position: absolute;
+  inset: 0;
+  animation: arrive 1.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--i) * 140ms + 250ms);
+}
+
+.bob {
+  position: absolute;
+  inset: 0;
+  animation: bob calc(7s + var(--i) * 1.3s) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -2.1s);
+}
+
+.planetBox {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.planet {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* no WebGL — a quiet painted sphere instead */
+.planet[data-fallback] {
+  border-radius: 50%;
+  transform: scale(0.55);
+  background: radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--accent) 80%, white) 0%, var(--accent) 30%, #050507 78%);
+  box-shadow: 0 0 calc(var(--u) * 40) color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.world[data-launching] .planetBox {
+  opacity: 0;
+}
+
+/* ── LABELS ── */
+.labelSet[data-layout='tall'] { display: none; }
+
+@media (max-aspect-ratio: 1/1) {
+  .labelSet[data-layout='wide'] { display: none; }
+  .labelSet[data-layout='tall'] { display: block; }
+}
+
+.lead {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background 0.4s ease;
+}
+
+.labelSet[data-side='above'] .lead,
+.labelSet[data-side='below'] .lead { width: 1px !important; }
+
+.labelSet[data-side='left'] .lead,
+.labelSet[data-side='right'] .lead { height: 1px !important; }
+
+.label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 3);
+  white-space: nowrap;
+  animation: labelIn 1.4s ease backwards;
+  animation-delay: calc(var(--i) * 140ms + 900ms);
+}
+
+.label[data-align='end'] {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.num {
+  font-size: max(9px, calc(var(--u) * 10));
+  color: #55595f;
+  letter-spacing: 0.2em;
+}
+
+.title {
+  font-family: var(--font-display), serif;
+  font-size: calc(var(--u) * 26);
+  line-height: 1.15;
+  color: #ece7dd;
+  letter-spacing: 0.05em;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+.title[data-italic] { font-style: italic; }
+
+.sub {
+  font-size: max(9px, calc(var(--u) * 10));
+  color: #6b7079;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+}
+
+.enter {
+  font-size: max(8px, calc(var(--u) * 9));
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(calc(var(--u) * -6));
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: calc(var(--u) * 2);
+}
+
+.labelSet[data-layout='tall'] .title { font-size: calc(var(--u) * 24); }
+
+.labelSet[data-layout='tall'] .sub {
+  white-space: normal;
+  max-width: calc(var(--u) * 128);
+}
+
+.world[data-hovered] .title {
+  color: #fff;
+  text-shadow: 0 0 calc(var(--u) * 18) color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.world[data-hovered] .lead {
+  background: color-mix(in srgb, var(--accent) 65%, rgba(255, 255, 255, 0.5));
+}
+
+.world[data-hovered] .enter {
+  opacity: 0.9;
+  transform: none;
+}
+
+.world:focus-visible .title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
+/* touch screens: no hover to reveal it, so keep a whisper of the way in */
+@media (hover: none) {
+  .enter { opacity: 0.5; transform: none; }
+}
+
+/* ── WARP ── */
+.stage[data-warping] .brand,
+.stage[data-warping] .tag,
+.stage[data-warping] .route,
+.stage[data-warping] .world:not([data-launching]) {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.stage[data-warping] .world[data-launching] .labelSet {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* ── MOTION ── */
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--u) * 46)) scale(0.86);
+  }
+}
+
+@keyframes bob {
+  from { transform: translateY(calc(var(--u) * -5)); }
+  to { transform: translateY(calc(var(--u) * 5)); }
+}
+
+@keyframes labelIn {
+  from { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bob { animation: none; }
+  .probe { display: none; }
+}

@@ -12,10 +12,10 @@ const thought: Thought = {
   subtitle: 'some nights the only plan\nis the road.',
   date: '2026-08',
   coverImage: {
-    // TEMPORARY photograph
-    src: '/images/antisocial.jpg',
-    alt: 'Fog and cold light hanging over an empty stage',
-    position: 'center 50%',
+    src: '/images/thoughts-midnight-notebook.jpg',
+    alt: 'Moonlight falling across handwritten pages on a dark desk',
+    position: 'center center',
+    mobilePosition: '62% center',
   },
   body: [
     {

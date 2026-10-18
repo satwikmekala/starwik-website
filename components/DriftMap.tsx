@@ -1,563 +1,538 @@
-/**
- * DriftMap — the Mapbox + GSAP heart of "Elsewhere".
- *
- * The map is a fixed, full-viewport canvas that never moves. A tall
- * scroll track (one viewport per chapter) sits behind it purely to
- * create scroll distance. ScrollTrigger reads progress over that track,
- * snaps to chapter positions, and every chapter change fires a
- * cinematic flyTo. The dot nav jumps by tweening the scroll position
- * itself, so scroll and click share one code path.
- */
-'use client'
+"use client";
 
-import { useCallback, useEffect, useRef } from 'react'
-import type { MutableRefObject } from 'react'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import gsap from "gsap";
 import {
   CHAPTERS,
   VISITED_COUNTRIES,
   LOCATION_DOTS,
-} from '@/app/drift/chapters'
-import styles from '@/app/drift/drift.module.css'
-
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
-
-export interface DriftMapController {
-  goToChapter: (index: number) => void
-}
+} from "@/app/drift/chapters";
+import { locationChapterIndex } from "@/app/drift/journey";
+import styles from "@/app/drift/drift.module.css";
 
 interface DriftMapProps {
-  activeIndex: number
-  onChapterChange: (index: number) => void
-  /** fires true on camera movestart, false on moveend — the panel softens mid-flight */
-  onFlyingChange: (flying: boolean) => void
-  controllerRef: MutableRefObject<DriftMapController | null>
+  activeIndex: number;
+  revision: number;
+  zoomRequest: { delta: number; revision: number };
+  panelOpen: boolean;
+  expanded: boolean;
+  onSelect: (index: number) => void;
+  onStatusChange: (status: "loading" | "ready" | "error") => void;
+  onFlyingChange: (flying: boolean) => void;
 }
 
-const TOTAL = CHAPTERS.length
-
-// Only render country polygons once per country (the boundaries tileset
-// ships one polygon per disputed worldview).
 const WORLDVIEW_FILTER = [
-  'any',
-  ['==', ['get', 'worldview'], 'all'],
-  ['in', 'IN', ['get', 'worldview']],
-]
+  "any",
+  ["==", ["get", "worldview"], "all"],
+  ["in", "IN", ["get", "worldview"]],
+];
 
 export default function DriftMap({
   activeIndex,
-  onChapterChange,
+  revision,
+  zoomRequest,
+  panelOpen,
+  expanded,
+  onSelect,
+  onStatusChange,
   onFlyingChange,
-  controllerRef,
 }: DriftMapProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const trackRef = useRef<HTMLDivElement>(null)
-  const coordsRef = useRef<HTMLDivElement>(null)
-  const constellationPathRef = useRef<SVGPathElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const cameraRef = useRef<mapboxgl.CameraOptions | null>(null);
+  const pointsRef = useRef<[number, number][] | null>(null);
+  const [readyMap, setReadyMap] = useState<mapboxgl.Map | null>(null);
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  const reducedMotionRef = useRef(false);
+  const consumedZoomRef = useRef(0);
+  const reportStatus = useEffectEvent(onStatusChange);
+  const reportFlying = useEffectEvent(onFlyingChange);
+  const selectLocation = useEffectEvent(onSelect);
 
-  const mapRef = useRef<mapboxgl.Map | null>(null)
-  const styleReadyRef = useRef(false)
-  const indexRef = useRef(0) // last index reported to the parent
-  const flownIndexRef = useRef(0) // last index the camera flew to
-  const jumpingRef = useRef(false) // true while a dot-nav scroll tween runs
-  const constellationPointsRef = useRef<[number, number][] | null>(null)
-  const constellationTokenRef = useRef(0)
-  const reducedMotionRef = useRef(false)
-  const onChapterChangeRef = useRef(onChapterChange)
-  const onFlyingChangeRef = useRef(onFlyingChange)
+  const updatePath = useCallback(() => {
+    const map = mapRef.current;
+    const path = pathRef.current;
+    if (!map || !path) return;
+    path.setAttribute(
+      "d",
+      pointsRef.current
+        ?.map((point, i) => {
+          const { x, y } = map.project(point);
+          return `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+        })
+        .join(" ") ?? "",
+    );
+  }, []);
 
   useEffect(() => {
-    onChapterChangeRef.current = onChapterChange
-    onFlyingChangeRef.current = onFlyingChange
-  }, [onChapterChange, onFlyingChange])
-
-  // ── Keep the constellation glued to the earth as the camera moves ──
-  const updateConstellationPath = useCallback(() => {
-    const map = mapRef.current
-    const path = constellationPathRef.current
-    if (!map || !path) return
-    const points = constellationPointsRef.current
-    if (!points) {
-      path.setAttribute('d', '')
-      return
+    const container = containerRef.current;
+    const constellationPath = pathRef.current;
+    if (!container) return;
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotion = () => {
+      reducedMotionRef.current = motionQuery.matches;
+      if (motionQuery.matches && constellationPath) {
+        gsap.killTweensOf(constellationPath);
+        gsap.set(constellationPath, { strokeDashoffset: 0 });
+      }
+      if (motionQuery.matches && mapRef.current) {
+        mapRef.current.stop();
+        if (cameraRef.current) mapRef.current.jumpTo(cameraRef.current);
+      }
+    };
+    updateMotion();
+    motionQuery.addEventListener("change", updateMotion);
+    let map: mapboxgl.Map;
+    try {
+      map = new mapboxgl.Map({
+        container,
+        accessToken: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
+        style: "mapbox://styles/mapbox/dark-v11",
+        center: CHAPTERS[0].coordinates,
+        zoom: CHAPTERS[0].zoom,
+        bearing: 0,
+        pitch: 35,
+        projection: "globe",
+        antialias: true,
+        attributionControl: false,
+      });
+    } catch {
+      reportStatus("error");
+      motionQuery.removeEventListener("change", updateMotion);
+      return;
     }
-    const d = points
-      .map((lngLat, i) => {
-        const { x, y } = map.project(lngLat)
-        return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`
-      })
-      .join(' ')
-    path.setAttribute('d', d)
-  }, [])
+    mapRef.current = map;
+    map.addControl(
+      new mapboxgl.AttributionControl({ compact: true }),
+      "bottom-right",
+    );
+    map.scrollZoom.disable();
+    map.dragRotate.disable();
+    map.keyboard.disable();
+    map.touchZoomRotate.disableRotation();
+    map.touchPitch.disable();
 
-  // ── Overview chapters emphasise their arc countries ──
-  const applyArcState = useCallback((index: number) => {
-    const map = mapRef.current
-    if (!map || !styleReadyRef.current) return
-    const arc = CHAPTERS[index].arcCountries ?? []
-    for (const iso of VISITED_COUNTRIES) {
-      map.setFeatureState(
-        {
-          source: 'drift-countries',
-          sourceLayer: 'country_boundaries',
-          id: iso,
-        },
-        { arc: arc.includes(iso) }
-      )
-    }
-  }, [])
-
-  // ── Map initialisation ──
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
-
-    reducedMotionRef.current = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches
-
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
-
-    const first = CHAPTERS[0]
-    const map = new mapboxgl.Map({
-      container,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: first.coordinates,
-      zoom: first.zoom,
-      bearing: first.bearing,
-      pitch: first.pitch,
-      attributionControl: false,
-      projection: 'globe',
-      antialias: true,
-    })
-    mapRef.current = map
-
-    // Scroll drives the camera — the map itself is not interactive.
-    map.scrollZoom.disable()
-    map.boxZoom.disable()
-    map.dragRotate.disable()
-    map.dragPan.disable()
-    map.keyboard.disable()
-    map.doubleClickZoom.disable()
-    map.touchZoomRotate.disable()
-    map.touchPitch.disable()
-
-    map.on('style.load', () => {
+    let loaded = false;
+    const loadingTimeout = window.setTimeout(() => {
+      if (!loaded) reportStatus("error");
+    }, 15000);
+    map.on("style.load", () => {
       // ── Restyle dark-v11 into the wikverse palette ──
       for (const layer of map.getStyle()?.layers ?? []) {
-        if (layer.type === 'background') {
-          map.setPaintProperty(layer.id, 'background-color', '#07070A')
+        if (layer.type === "background") {
+          map.setPaintProperty(layer.id, "background-color", "#080808");
         }
-        if (layer.type === 'fill' && /water/.test(layer.id)) {
-          map.setPaintProperty(layer.id, 'fill-color', '#0D0D12')
-        }
-        if (layer.type === 'line' && layer.id.startsWith('admin')) {
+        if (layer.type === "fill") {
           map.setPaintProperty(
             layer.id,
-            'line-color',
-            'rgba(242,237,230,0.06)'
-          )
+            "fill-color",
+            /water/.test(layer.id)
+              ? "#070707"
+              : /building/.test(layer.id)
+                ? "#242424"
+                : "#171717",
+          );
         }
-        if (layer.type === 'symbol') {
+        if (layer.type === "line") {
+          map.setPaintProperty(
+            layer.id,
+            "line-color",
+            /water/.test(layer.id) ? "#242424" : "#404040",
+          );
+        }
+        if (layer.type === "hillshade") {
+          map.setPaintProperty(layer.id, "hillshade-shadow-color", "#050505");
+          map.setPaintProperty(
+            layer.id,
+            "hillshade-highlight-color",
+            "#383838",
+          );
+          map.setPaintProperty(layer.id, "hillshade-accent-color", "#1c1c1c");
+        }
+        if (layer.type === "line" && layer.id.startsWith("admin")) {
+          map.setPaintProperty(
+            layer.id,
+            "line-color",
+            "rgba(255,255,255,0.16)",
+          );
+        }
+        if (layer.type === "symbol") {
           if (/poi|road|transit|airport|ferry|golf/.test(layer.id)) {
-            map.setLayoutProperty(layer.id, 'visibility', 'none')
+            map.setLayoutProperty(layer.id, "visibility", "none");
           } else {
-            map.setPaintProperty(layer.id, 'text-color', 'rgba(242,237,230,0.3)')
             map.setPaintProperty(
               layer.id,
-              'text-halo-color',
-              'rgba(7,7,10,0.75)'
-            )
+              "text-color",
+              "rgba(255,255,255,0.63)",
+            );
+            map.setPaintProperty(
+              layer.id,
+              "text-halo-color",
+              "rgba(8,8,8,0.9)",
+            );
           }
         }
       }
 
       // Deep-space atmosphere around the globe
       map.setFog({
-        color: 'rgba(13,13,18,0.9)',
-        'high-color': '#0D0D12',
-        'space-color': '#07070A',
-        'horizon-blend': 0.04,
-        'star-intensity': 0.2,
-      })
+        color: "rgba(16,16,16,0.9)",
+        "high-color": "#080808",
+        "space-color": "#080808",
+        "horizon-blend": 0.04,
+        "star-intensity": 0.2,
+      });
 
       // 3D terrain — the Himalaya chapters fly at pitch 55–60 over this
-      map.addSource('drift-dem', {
-        type: 'raster-dem',
-        url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+      map.addSource("drift-dem", {
+        type: "raster-dem",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
-      })
-      map.setTerrain({ source: 'drift-dem', exaggeration: 1.35 })
+      });
+      map.setTerrain({ source: "drift-dem", exaggeration: 1.35 });
 
       // ── Country fills ──
-      map.addSource('drift-countries', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1',
-        promoteId: 'iso_3166_1',
-      })
+      map.addSource("drift-countries", {
+        type: "vector",
+        url: "mapbox://mapbox.country-boundaries-v1",
+        promoteId: "iso_3166_1",
+      });
 
       const firstSymbolId = map
         .getStyle()
-        ?.layers?.find((l) => l.type === 'symbol')?.id
+        ?.layers?.find((l) => l.type === "symbol")?.id;
 
       map.addLayer(
         {
-          id: 'drift-country-fill',
-          type: 'fill',
-          source: 'drift-countries',
-          'source-layer': 'country_boundaries',
+          id: "drift-country-fill",
+          type: "fill",
+          source: "drift-countries",
+          "source-layer": "country_boundaries",
           filter: WORLDVIEW_FILTER as never,
           paint: {
-            'fill-color': '#F2EDE6',
-            'fill-opacity': 0.02,
+            "fill-color": "#FFFFFF",
+            "fill-opacity": 0.02,
           },
         },
-        firstSymbolId
-      )
+        firstSymbolId,
+      );
 
       map.addLayer(
         {
-          id: 'drift-visited-fill',
-          type: 'fill',
-          source: 'drift-countries',
-          'source-layer': 'country_boundaries',
+          id: "drift-visited-fill",
+          type: "fill",
+          source: "drift-countries",
+          "source-layer": "country_boundaries",
           filter: [
-            'all',
+            "all",
             WORLDVIEW_FILTER,
-            ['in', ['get', 'iso_3166_1'], ['literal', VISITED_COUNTRIES]],
+            ["in", ["get", "iso_3166_1"], ["literal", VISITED_COUNTRIES]],
           ] as never,
           paint: {
-            'fill-color': '#C45A18',
-            'fill-opacity': [
-              'case',
-              ['boolean', ['feature-state', 'hover'], false],
-              0.35,
-              ['boolean', ['feature-state', 'arc'], false],
-              0.32,
-              0.2,
+            "fill-color": "#FFDA55",
+            "fill-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              0.13,
+              ["boolean", ["feature-state", "arc"], false],
+              0.11,
+              0.025,
             ] as never,
           },
         },
-        firstSymbolId
-      )
+        firstSymbolId,
+      );
 
       // ── Specific visited locations — brighter amber dots at 1.2x ──
-      map.addSource('drift-locations', {
-        type: 'geojson',
+      map.addSource("drift-locations", {
+        type: "geojson",
         data: {
-          type: 'FeatureCollection',
+          type: "FeatureCollection",
           features: LOCATION_DOTS.map((dot) => ({
-            type: 'Feature' as const,
-            properties: { name: dot.name },
+            type: "Feature" as const,
+            properties: {
+              name: dot.name,
+              chapterIndex: locationChapterIndex(dot.name),
+            },
             geometry: {
-              type: 'Point' as const,
+              type: "Point" as const,
               coordinates: dot.coordinates,
             },
           })),
         },
-      })
+      });
       const dotRadius = [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        2, 2.6,
-        6, 3.6,
-        10, 4.8,
-      ] as never
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        2,
+        2.6,
+        6,
+        3.6,
+        10,
+        4.8,
+      ] as never;
       map.addLayer({
-        id: 'drift-location-glow',
-        type: 'circle',
-        source: 'drift-locations',
+        id: "drift-location-glow",
+        type: "circle",
+        source: "drift-locations",
         paint: {
-          'circle-color': '#E8A040',
-          'circle-radius': ['interpolate', ['linear'], ['zoom'], 2, 7, 10, 13] as never,
-          'circle-blur': 1.4,
-          'circle-opacity': 0.35,
+          "circle-color": "#FFDA55",
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            2,
+            7,
+            10,
+            13,
+          ] as never,
+          "circle-blur": 1.4,
+          "circle-opacity": 0.35,
         },
-      })
+      });
       map.addLayer({
-        id: 'drift-location-dot',
-        type: 'circle',
-        source: 'drift-locations',
+        id: "drift-active-ring",
+        type: "circle",
+        source: "drift-locations",
+        filter: ["==", ["get", "chapterIndex"], 0],
         paint: {
-          'circle-color': '#E8A040',
-          'circle-radius': dotRadius,
-          'circle-opacity': 0.95,
+          "circle-color": "#FFDA55",
+          "circle-radius": 18,
+          "circle-opacity": 0.08,
+          "circle-stroke-color": "#FFDA55",
+          "circle-stroke-width": 1,
+          "circle-stroke-opacity": 0.55,
+          "circle-pitch-scale": "viewport",
         },
-      })
+      });
+      map.addLayer({
+        id: "drift-location-dot",
+        type: "circle",
+        source: "drift-locations",
+        paint: {
+          "circle-color": "#FFDA55",
+          "circle-radius": dotRadius,
+          "circle-opacity": 0.95,
+        },
+      });
 
-      styleReadyRef.current = true
-      applyArcState(indexRef.current)
-    })
+      // Generous hit areas keep the visible map markers delicate and easy to tap.
+      map.addLayer({
+        id: "drift-location-hit",
+        type: "circle",
+        source: "drift-locations",
+        paint: { "circle-radius": 22, "circle-opacity": 0 },
+      });
 
-    // ── Hover glow on visited countries ──
-    let hoveredIso: string | null = null
-    const setHover = (iso: string | null) => {
-      if (hoveredIso === iso) return
-      if (hoveredIso) {
-        map.setFeatureState(
-          {
-            source: 'drift-countries',
-            sourceLayer: 'country_boundaries',
-            id: hoveredIso,
-          },
-          { hover: false }
-        )
-      }
-      hoveredIso = iso
-      if (iso) {
-        map.setFeatureState(
-          {
-            source: 'drift-countries',
-            sourceLayer: 'country_boundaries',
-            id: iso,
-          },
-          { hover: true }
-        )
-      }
-    }
-    map.on('mousemove', 'drift-visited-fill', (e) => {
-      const iso = e.features?.[0]?.id
-      setHover(typeof iso === 'string' ? iso : null)
-    })
-    map.on('mouseleave', 'drift-visited-fill', () => setHover(null))
-
-    map.on('move', updateConstellationPath)
-    map.on('resize', updateConstellationPath)
-
-    // ── Live GPS readout — ticks via rAF while the camera flies ──
-    const setCoordsText = () => {
-      if (!coordsRef.current) return
-      const c = map.getCenter()
-      coordsRef.current.textContent = formatCoords([c.lng, c.lat])
-    }
-    let coordsRaf = 0
-    const tickCoords = () => {
-      setCoordsText()
-      coordsRaf = requestAnimationFrame(tickCoords)
-    }
-    map.on('movestart', () => {
-      onFlyingChangeRef.current(true)
-      cancelAnimationFrame(coordsRaf)
-      coordsRaf = requestAnimationFrame(tickCoords)
-    })
-    map.on('moveend', () => {
-      onFlyingChangeRef.current(false)
-      cancelAnimationFrame(coordsRaf)
-      setCoordsText()
-    })
-    setCoordsText()
-
+      loaded = true;
+      clearTimeout(loadingTimeout);
+      setReadyMap(map);
+      reportStatus("ready");
+    });
+    map.on("error", (event) => {
+      const status = (event.error as Error & { status?: number })?.status;
+      if (!loaded && (status === 401 || status === 403)) reportStatus("error");
+    });
+    map.on("click", "drift-location-hit", (event) => {
+      const index = event.features?.[0]?.properties?.chapterIndex;
+      if (typeof index === "number" && index >= 0) selectLocation(index);
+    });
+    map.on("mouseenter", "drift-location-hit", () => {
+      map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", "drift-location-hit", () => {
+      map.getCanvas().style.cursor = "";
+    });
+    map.on("movestart", () => reportFlying(true));
+    map.on("moveend", () => reportFlying(false));
+    map.on("move", updatePath);
+    const observer = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      map.resize();
+      setViewport({ width, height });
+    });
+    observer.observe(container);
     return () => {
-      styleReadyRef.current = false
-      cancelAnimationFrame(coordsRaf)
-      map.remove()
-      mapRef.current = null
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+      clearTimeout(loadingTimeout);
+      observer.disconnect();
+      motionQuery.removeEventListener("change", updateMotion);
+      if (constellationPath) gsap.killTweensOf(constellationPath);
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [updatePath]);
 
-  // ── Scroll orchestration ──
   useEffect(() => {
-    const track = trackRef.current
-    if (!track) return
-
-    const st = ScrollTrigger.create({
-      trigger: track,
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: (self) => {
-        if (jumpingRef.current) return
-        const idx = Math.round(self.progress * (TOTAL - 1))
-        if (idx !== indexRef.current) {
-          indexRef.current = idx
-          onChapterChangeRef.current(idx)
+    const map = mapRef.current;
+    const path = pathRef.current;
+    // A recreated map must load its own layers before camera and feature updates.
+    if (!map || readyMap !== map || !viewport.width) return;
+    const chapter = CHAPTERS[activeIndex];
+    const mobile = viewport.width < 768;
+    const padding = mobile
+      ? {
+          top: panelOpen && expanded ? 88 : 160,
+          right: 24,
+          left: 24,
+          bottom: panelOpen
+            ? Math.min(
+                viewport.height * (expanded ? 0.73 : 0.43),
+                viewport.height - 150,
+              )
+            : 120,
         }
-      },
-      snap: {
-        snapTo: 1 / (TOTAL - 1),
-        duration: { min: 0.35, max: 0.9 },
-        delay: 0.08,
-        ease: 'power2.out',
-      },
-    })
-    return () => st.kill()
-  }, [])
-
-  // ── Dot-nav / keyboard jumps share the scroll code path ──
-  const goToChapter = useCallback((index: number) => {
-    const target = Math.max(0, Math.min(TOTAL - 1, index))
-    if (target === indexRef.current && !jumpingRef.current) return
-    jumpingRef.current = true
-    indexRef.current = target
-    onChapterChangeRef.current(target)
-    gsap.to(window, {
-      duration: 1.1,
-      ease: 'power2.inOut',
-      scrollTo: { y: target * window.innerHeight },
-      overwrite: 'auto',
-      onComplete: () => {
-        jumpingRef.current = false
-      },
-      onInterrupt: () => {
-        jumpingRef.current = false
-      },
-    })
-  }, [])
-
-  useEffect(() => {
-    controllerRef.current = { goToChapter }
-    return () => {
-      controllerRef.current = null
+      : { top: 100, left: 64, right: panelOpen ? 444 : 64, bottom: 150 };
+    map.stop();
+    for (const iso of VISITED_COUNTRIES) {
+      map.setFeatureState(
+        {
+          source: "drift-countries",
+          sourceLayer: "country_boundaries",
+          id: iso,
+        },
+        { arc: chapter.arcCountries?.includes(iso) ?? false },
+      );
     }
-  }, [controllerRef, goToChapter])
+    map.setFilter("drift-active-ring", [
+      "==",
+      ["get", "chapterIndex"],
+      activeIndex,
+    ]);
+    map.setPaintProperty("drift-location-dot", "circle-opacity", [
+      "case",
+      ["==", ["get", "chapterIndex"], activeIndex],
+      1,
+      0.7,
+    ]);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
-        e.preventDefault()
-        goToChapter(indexRef.current + 1)
-      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-        e.preventDefault()
-        goToChapter(indexRef.current - 1)
-      }
+    // Attach the arc reveal before moving the camera: jumpTo fires moveend synchronously.
+    if (path) {
+      gsap.killTweensOf(path);
+      gsap.set(path, { opacity: 0, strokeDasharray: "none" });
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [goToChapter])
-
-  // ── Chapter change → cinematic flight + constellation ──
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map) return
-    const chapter = CHAPTERS[activeIndex]
-
-    if (activeIndex !== flownIndexRef.current) {
-      flownIndexRef.current = activeIndex
-      const camera = {
-        center: chapter.coordinates,
-        zoom: chapter.zoom,
-        bearing: chapter.bearing,
-        pitch: chapter.pitch,
-      }
-      if (reducedMotionRef.current) {
-        map.jumpTo(camera)
-      } else {
-        // speed/curve (not a fixed duration) so long hauls arc out
-        // through space and short hops stay tight — pure cinema
-        map.flyTo({
-          ...camera,
-          speed: 1.1,
-          curve: 1.5,
-          maxDuration: 6000,
-          essential: true,
-        })
-      }
-    }
-
-    applyArcState(activeIndex)
-
-    // Constellation lines draw themselves once the flight settles
-    const token = ++constellationTokenRef.current
-    const path = constellationPathRef.current
-    if (chapter.constellation && path) {
-      constellationPointsRef.current = chapter.constellation
-      gsap.set(path, { opacity: 0 })
-      const startDraw = () => {
-        if (token !== constellationTokenRef.current) return
-        updateConstellationPath()
-        const length = path.getTotalLength()
-        if (length === 0) return
-        gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
-          opacity: 1,
-        })
+    pointsRef.current = chapter.constellation ?? null;
+    const drawArc = () => {
+      if (!path || !chapter.constellation) return;
+      updatePath();
+      const length = path.getTotalLength();
+      if (!length) return;
+      gsap.set(path, {
+        strokeDasharray: length,
+        strokeDashoffset: reducedMotionRef.current ? 0 : length,
+        opacity: 1,
+      });
+      if (!reducedMotionRef.current)
         gsap.to(path, {
           strokeDashoffset: 0,
-          duration: 1.5,
-          ease: 'power1.inOut',
-          // free the dash so the line survives later re-projection
-          onComplete: () => gsap.set(path, { strokeDasharray: 'none' }),
-        })
-      }
-      map.once('moveend', startDraw)
-      return () => {
-        map.off('moveend', startDraw)
-      }
-    } else if (path) {
-      gsap.to(path, {
-        opacity: 0,
-        duration: 0.4,
-        onComplete: () => {
-          if (token === constellationTokenRef.current) {
-            constellationPointsRef.current = null
-            updateConstellationPath()
-          }
+          duration: 0.65,
+          ease: "power2.out",
+          onComplete: () => {
+            gsap.set(path, { strokeDasharray: "none" });
+          },
+        });
+    };
+    map.once("moveend", drawArc);
+    let camera: mapboxgl.CameraOptions = {
+      center: chapter.coordinates,
+      zoom: chapter.zoom - (mobile && chapter.isOverview ? 0.5 : 0),
+      bearing: chapter.bearing,
+      pitch: mobile ? Math.min(chapter.pitch, 40) : chapter.pitch,
+      padding,
+    };
+    const destinations = LOCATION_DOTS.filter(
+      (dot) => locationChapterIndex(dot.name) === activeIndex,
+    );
+    if (destinations.length > 1 && !chapter.isOverview) {
+      const bounds = new mapboxgl.LngLatBounds();
+      destinations.forEach((dot) => bounds.extend(dot.coordinates));
+      const fitted = map.cameraForBounds(bounds, {
+        padding: {
+          top: padding.top + 16,
+          right: padding.right + 16,
+          bottom: padding.bottom + 16,
+          left: padding.left + 16,
         },
-      })
+        maxZoom: chapter.zoom,
+        bearing: chapter.bearing,
+        pitch: camera.pitch,
+      });
+      if (fitted?.center && fitted.zoom !== undefined)
+        camera = { ...camera, center: fitted.center, zoom: fitted.zoom };
     }
-  }, [activeIndex, applyArcState, updateConstellationPath])
+    cameraRef.current = camera;
+    if (reducedMotionRef.current) map.jumpTo(camera);
+    else
+      map.flyTo({
+        ...camera,
+        duration: chapter.isOverview ? 1500 : 1250,
+        curve: 1.25,
+        essential: false,
+      });
+    // Identical recenter requests may not emit an event.
+    if (!map.isMoving()) drawArc();
+    return () => {
+      map.off("moveend", drawArc);
+      if (path) gsap.killTweensOf(path);
+    };
+  }, [
+    activeIndex,
+    revision,
+    panelOpen,
+    expanded,
+    readyMap,
+    viewport,
+    updatePath,
+  ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (
+      !map ||
+      readyMap !== map ||
+      zoomRequest.revision <= consumedZoomRef.current
+    )
+      return;
+    consumedZoomRef.current = zoomRequest.revision;
+    if (map.isMoving() && cameraRef.current) map.jumpTo(cameraRef.current);
+    const zoom = Math.max(
+      map.getMinZoom(),
+      Math.min(map.getMaxZoom(), map.getZoom() + zoomRequest.delta),
+    );
+    const camera = {
+      center: map.getCenter(),
+      zoom,
+      bearing: map.getBearing(),
+      pitch: map.getPitch(),
+    };
+    cameraRef.current = camera;
+    map.easeTo({
+      ...camera,
+      duration: reducedMotionRef.current ? 0 : 240,
+      essential: false,
+    });
+  }, [zoomRequest, readyMap]);
 
   return (
     <>
-      {/* Scroll distance: one viewport of scrolling per chapter */}
       <div
-        ref={trackRef}
-        className={styles.scrollTrack}
-        style={{ height: `${TOTAL * 100}svh` }}
-        aria-hidden
+        ref={containerRef}
+        className={styles.mapContainer}
+        aria-label="Travel map. Drag to explore, or choose a chapter below."
       />
-
-      {/* The map never moves — the world moves beneath it */}
-      <div ref={containerRef} className={styles.mapContainer} />
-
-      {/* Constellation lines between visited countries (overview chapters) */}
-      <svg className={styles.constellationSvg} aria-hidden>
-        <path
-          ref={constellationPathRef}
-          className={styles.constellationPath}
-        />
+      <svg className={styles.constellationSvg} aria-hidden="true">
+        <path ref={pathRef} className={styles.constellationPath} />
       </svg>
-
-      {/* Progress: 1px amber line on the very left edge,
-          filling chapter by chapter with a 400ms ease */}
-      <div className={styles.progressTrack} aria-hidden>
-        <div
-          className={styles.progressFill}
-          style={{ transform: `scaleY(${activeIndex / (TOTAL - 1)})` }}
-        />
-      </div>
-
-      {/* Coordinates readout — ticks like a GPS during flight */}
-      <div ref={coordsRef} className={styles.coordsReadout}>
-        {formatCoords(CHAPTERS[0].coordinates)}
-      </div>
-
-      {/* Scroll hint, visible on the opening chapter only */}
-      <div
-        className={`${styles.scrollHint} ${
-          activeIndex === 0 ? '' : styles.scrollHintHidden
-        }`}
-        aria-hidden
-      >
-        <span>SCROLL TO DEPART</span>
-        <span className={styles.scrollHintLine} />
-      </div>
-
-      {/* Mapbox requires attribution — kept, but whispered */}
-      <div className={styles.attribution}>© Mapbox © OpenStreetMap</div>
     </>
-  )
-}
-
-function formatCoords([lng, lat]: [number, number]): string {
-  const ns = lat >= 0 ? 'N' : 'S'
-  const ew = lng >= 0 ? 'E' : 'W'
-  return `${Math.abs(lat).toFixed(4)}°${ns} · ${Math.abs(lng).toFixed(4)}°${ew}`
+  );
 }
