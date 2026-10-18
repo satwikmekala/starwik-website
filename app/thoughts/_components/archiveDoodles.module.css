@@ -1,0 +1,73 @@
+.layer {
+  position: absolute;
+  left: calc(50% - 50vw);
+  top: 0;
+  width: 100vw;
+  height: 100%;
+  z-index: 1;
+  overflow: clip;
+  pointer-events: none;
+  color: #8993ad;
+  display: none;
+}
+.margin { position: absolute; top: 0; bottom: 0; width: max(28px, calc((100% - 984px) / 2)); }
+.margin[data-side='left'] { left: 0; }
+.margin[data-side='right'] { right: 0; }
+.mark {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: min(var(--size), 52%);
+  translate: -50% -50%;
+  rotate: var(--angle);
+}
+.mark svg, .titleSpark svg { display: block; width: 100%; height: auto; overflow: visible; }
+.constellation {
+  position: absolute;
+  right: calc(max(28px, (100% - 984px) / 2) + 390px);
+  top: 48px;
+  width: 110px;
+  rotate: -7deg;
+  opacity: .55;
+}
+.constellation svg { display: block; width: 100%; height: auto; }
+.constellation .trace { animation: titlePencil 38s ease-in-out calc(var(--stroke-order) * 150ms) infinite; }
+.trace {
+  stroke-linecap: butt;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.ambient { opacity: 0; animation: presence 36s linear var(--phase) infinite; }
+.ambientGroup { position: absolute; inset: 0; transition: opacity 800ms ease; }
+.ambient .trace { animation: pencil 36s ease-in-out calc(var(--phase) + var(--pen-delay) + var(--stroke-order) * 90ms) infinite; }
+.escape { opacity: 0; transition: opacity 0s 750ms; }
+.escape .trace { transition: stroke-dashoffset 460ms ease-in calc(var(--stroke-order) * 25ms); }
+.escape[data-active='true'] { opacity: .8; transition-delay: 0s; }
+.escape[data-active='true'] .trace {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1000ms cubic-bezier(.35, .05, .65, .95) calc(var(--pen-delay) + var(--stroke-order) * 90ms);
+}
+/* The ambient marks quietly recede when a card tells its own little story. */
+.layer[data-engaged='true'] .ambientGroup { opacity: .18; }
+.layer[data-paused='true'] .ambient, .layer[data-paused='true'] .trace { animation-play-state: paused; }
+.titleSpark {
+  display: inline-block;
+  vertical-align: top;
+  width: 35px;
+  margin: -3px 0 0 12px;
+  color: #b5abc6;
+  opacity: .65;
+  pointer-events: none;
+}
+.titleSpark .trace { animation: titlePencil 22s ease-in-out calc(var(--stroke-order) * 180ms) infinite; }
+@keyframes presence { 0%, 30%, 100% { opacity: 0; } 2%, 28% { opacity: .52; } }
+@keyframes pencil { 0%, 30%, 100% { stroke-dashoffset: 1; } 4%, 26% { stroke-dashoffset: 0; } }
+@keyframes titlePencil { 0%, 64%, 100% { stroke-dashoffset: 1; } 5%, 58% { stroke-dashoffset: 0; } }
+@media (min-width: 1120px) { .layer { display: block; } }
+@media (max-width: 820px) { .titleSpark { width: 24px; margin-left: 7px; } }
+@media (prefers-reduced-motion: reduce) {
+  .ambient, .ambient .trace, .titleSpark .trace, .constellation .trace { animation: none; }
+  .ambient[data-phase='0'] { opacity: .4; }
+  .ambient[data-phase='0'] .trace, .titleSpark .trace, .constellation .trace { stroke-dashoffset: 0; }
+  .escape, .escape .trace, .ambientGroup { transition: none; }
+}

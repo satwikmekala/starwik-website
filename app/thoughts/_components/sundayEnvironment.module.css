@@ -1,0 +1,144 @@
+/* A modest room drawn in material layers; all coordinates share a 6:5 stage.
+   No timers, image downloads, blur, canvas, or per-object scroll listeners. */
+.environment { --window-attention: clamp(0, calc((var(--scene-progress, 0) - .78) / .22), 1); position: absolute; inset: 0; overflow: hidden; background: #ded5bf; }
+.canvas { position: absolute; width: 100%; aspect-ratio: 6 / 5; top: 50%; transform: translateY(-50%); isolation: isolate; overflow: hidden; background: #e8dfcd; }
+.canvas div, .canvas i, .canvas b, .canvas em { position: absolute; display: block; }
+.architecture, .rugSlot, .furniture, .breakfast, .illumination { inset: 0; }
+.wall { inset: 0 0 38%; background: linear-gradient(110deg, #d6cfbd, #eee5d2 70%, #f0e7d4); border-bottom: 5px solid #c3b49a; }
+.floor { inset: 62% 0 0; background: repeating-linear-gradient(97deg, transparent 0 13%, #6f51341a 13.2% 13.5%), linear-gradient(165deg, #ba9670, #caaa80 65%, #b89772); }
+.door { left: -3%; top: 16%; width: 14%; height: 46%; background: #b7ac95; border: 5px solid #cdc3ac; box-shadow: inset -3px 0 #9d927d; }
+.door i { right: 9%; top: 53%; width: 14%; height: 2%; background: #776950; }
+.board { left: 15%; top: 24%; width: 17%; height: 23%; background: #ad9270; border: 4px solid #957958; box-shadow: 2px 3px 2px #5949321a; }
+.board i { background: #e4dac3; box-shadow: 0 1px 2px #443e3330; }
+.board i:nth-child(1) { left: 10%; top: 12%; width: 44%; height: 32%; background: linear-gradient(#bac6c5 50%, #738f98 51% 76%, #ded2b6 77%); border: 3px solid #eee4d1; transform: rotate(-3deg); }
+.board i:nth-child(2) { right: 10%; top: 12%; width: 22%; height: 40%; background: repeating-linear-gradient(0deg, #ded3b8 0 5px, #b7aa902e 6px); }
+.board i:nth-child(3) { left: 11%; top: 59%; width: 32%; height: 28%; background: linear-gradient(35deg, #7e8e79 45%, #a8bdc2 46%); border: 3px solid #eee4d1; }
+.board i:nth-child(4) { right: 10%; bottom: 10%; width: 34%; height: 13%; background: #b87e65; transform: rotate(3deg); }
+.board i:nth-child(5) { right: 10%; top: 58%; width: 31%; height: 7%; }
+.window { left: 46%; top: 9%; width: 43%; height: 47%; background: #bac9ca; border: 8px solid #ede6d6; box-shadow: -5px 5px 0 #afa590, 2px 9px 0 #c3b49b, 2px 13px 3px #66503a18; overflow: hidden; }
+.exterior { inset: 0; opacity: calc(.58 + var(--window-attention) * .12); background: #bfced0; }
+.exterior > i { bottom: -5%; width: 33%; height: 83%; background-color: #9ba5a4; background-image: repeating-linear-gradient(0deg, transparent 0 26px, #b7b8ab 27px 39px), repeating-linear-gradient(90deg, transparent 0 18px, #77888c 19px 29px, transparent 30px 42px); border-top: 5px solid #8f9999; }
+.exterior > i:nth-child(1) { left: -4%; height: 67%; }
+.exterior > i:nth-child(2) { left: 32%; background-color: #a6a69d; }
+.exterior > i:nth-child(3) { right: -3%; height: 72%; }
+.glass { inset: 0; background: linear-gradient(130deg, #f8edd445, transparent 65%); }
+.mullion { left: 48%; top: 0; width: 5px; height: 100%; background: #e8dfcd; box-shadow: 2px 0 #989b9029; }
+.mullion::after { content: ''; position: absolute; left: -130px; top: 48%; width: 300px; height: 5px; background: #e8dfcd; }
+.curtain { left: 88%; top: 7%; width: 8%; height: 55%; background: repeating-linear-gradient(90deg, #e7ddc7, #d5c9b0 24%, #eee4cf 48%); clip-path: polygon(0 0, 100% 0, 100% 100%, 15% 98%, 32% 50%); opacity: .85; }
+.rug { left: 14%; top: 67%; width: 76%; height: 29%; transform: skewX(-19deg) rotate(-3deg); background: repeating-linear-gradient(0deg, #f2e4bc26 0 1px, transparent 1px 4px), #d7bd83; border: 2px solid #eee0b9; box-shadow: 0 3px 2px #6652382b; }
+.rug::before { content: ''; position: absolute; inset: 8% 4%; border: 2px solid #8b8c68; box-shadow: 0 0 0 4px #e5d3a4, inset 0 0 0 4px #e5d3a4; }
+.rug i { inset: 19% 9%; border-top: 1px solid #a1a078; border-bottom: 1px solid #a1a078; background: repeating-linear-gradient(90deg, transparent 0 17%, #ada77742 17% 18%); }
+.sofa { left: -7%; top: 48%; width: 44%; height: 23%; border-radius: 10px 13px 5px 5px; background: linear-gradient(90deg, #7e8774, #9da48a); border-bottom: 10px solid #6d7767; box-shadow: 4px 9px 5px #5c503c22; }
+.sofa::before, .sofa::after { content: ''; position: absolute; top: 88%; height: 20%; width: 3%; background: #735e46; }
+.sofa::before { left: 18%; }.sofa::after { right: 9%; }
+.sofa i { top: 6%; width: 42%; height: 58%; border-radius: 8px; background: linear-gradient(110deg, #a3aa91, #8b967f); border: 1px solid #737e6a55; }
+.sofa i:first-child { left: 9%; }.sofa i:nth-child(2) { right: 5%; }
+.sofa b { left: 8%; right: 3%; top: 68%; height: 23%; border-radius: 6px; background: #a4aa91; border-bottom: 2px solid #79866d; }
+.plant { left: 82%; top: 42%; width: 13%; height: 28%; }
+.plant::before { content: ''; position: absolute; left: 49%; width: 2px; height: 75%; background: #666f43; transform: rotate(4deg); }
+.plant i { width: 43%; height: 19%; border-radius: 80% 5% 80% 5%; background: linear-gradient(30deg, #5e704b, #93a06d); }
+.plant i:nth-child(1) { left: 10%; top: 6%; transform: rotate(65deg); }.plant i:nth-child(2) { left: 49%; top: 0; transform: rotate(-20deg); }.plant i:nth-child(3) { left: 6%; top: 29%; transform: rotate(76deg); }.plant i:nth-child(4) { left: 51%; top: 27%; }.plant i:nth-child(5) { left: 39%; top: 45%; transform: rotate(12deg); }
+.plant b { left: 24%; bottom: 0; width: 57%; height: 31%; background: linear-gradient(90deg, #a17759, #c89b74); clip-path: polygon(0 0, 100% 0, 86% 100%, 15% 100%); border-top: 4px solid #927158; }
+.table { left: 45%; top: 64%; width: 34%; height: 20%; }
+.table b { inset: 0 0 61%; border-radius: 50%; background: linear-gradient(165deg, #c8a277, #b38a5e); border-bottom: 4px solid #93704d; box-shadow: 0 5px 3px #73563c22; }
+.table i { top: 27%; width: 5%; height: 68%; background: #95704e; transform: rotate(5deg); }.table i:first-child { left: 15%; }.table i:nth-child(2) { right: 15%; transform: rotate(-5deg); }
+.napkin { left: 51%; top: 64%; width: 10%; height: 4%; background: #ded6bd; transform: rotate(-12deg); }
+.plate { left: 53%; top: 63%; width: 10%; height: 5%; border-radius: 50%; background: #f2ead6; border: 2px solid #dfd5bd; }
+.plate i { left: 8%; top: 10%; width: 50%; height: 66%; border-radius: 40%; background: #d4b778; }.plate b { right: 9%; top: 10%; width: 37%; height: 61%; border-radius: 45%; background: #e1cb85; }
+.bowl { left: 64%; top: 61.5%; width: 9%; height: 5%; border-radius: 20% 20% 50% 50%; background: linear-gradient(#f4edde, #d9cfb9); box-shadow: 1px 3px 1px #71583d22; border-top: 2px solid #ece1cf; }
+.bowl i { top: -18%; width: 24%; height: 45%; background: #b85f4e; border-radius: 50% 50% 40% 40%; border-top: 2px solid #788057; transform: rotate(-20deg); }.bowl i:nth-child(1) { left: 6%; }.bowl i:nth-child(2) { left: 31%; top: -35%; }.bowl i:nth-child(3) { left: 60%; }.bowl i:nth-child(4) { left: 23%; top: 3%; background: #ca7862; }.bowl i:nth-child(5) { left: 49%; top: 9%; background: #ca7862; }
+.coffee { left: 48%; top: 61%; width: 4%; height: 5%; background: #e7dfc9; border-radius: 20% 20% 40% 40%; border-top: 4px solid #6b513b; box-shadow: 1px 2px #846b4430; }.coffee::after { content: ''; position: absolute; left: -35%; top: 0; width: 40%; height: 60%; border: 2px solid #e7dfc9; border-radius: 50%; }
+.illumination { pointer-events: none; mix-blend-mode: soft-light; }
+.sunlight { inset: 48% 8% 0 9%; background: linear-gradient(135deg, #fff4cc, #fff1c5 75%, #fff4d066); clip-path: polygon(48% 0, 92% 0, 67% 100%, 0 100%); transform: translateX(calc(var(--scene-progress, 0) * 3px)); }
+.windowShadow { left: 23%; top: 55%; width: 54%; height: 45%; background: #746346; opacity: .27; clip-path: polygon(54% 0, 57% 0, 23% 100%, 19% 100%); }
+.texture { inset: 0; opacity: .16; background: repeating-linear-gradient(0deg, transparent 0 3px, #5a4a3010 3px 4px), repeating-linear-gradient(91deg, transparent 0 5px, #fff9df24 5px 6px); pointer-events: none; }
+.foreground { inset: 59% 0 0; background: #4f524a; opacity: calc(var(--window-attention) * .055); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .environment { --window-attention: 0; }.sunlight { transform: none; } }
+/* Keep the tiny red fruit legible where the light grazes the tabletop. */
+.breakfast { z-index: 1; }
+.bowl i { border-radius: 50% 50% 48% 48%; clip-path: polygon(15% 0, 85% 0, 100% 38%, 65% 100%, 35% 94%, 0 36%); }
+.texture { z-index: 2; }
+.foreground { z-index: 3; }
+
+/* A shared room, with composition steered by the page's focus intent. */
+.environment { --window-attention: var(--scene-focus, 0); }
+.canvas { filter: brightness(var(--scene-exposure, 1)) contrast(var(--scene-contrast, 1)); }
+.window { transform-origin: 85% 100%; transform: translateX(calc(var(--scene-focus, 0) * -3%)) scale(calc(1 + var(--scene-focus, 0) * .24)); }
+.curtain { opacity: calc(.85 - var(--scene-focus, 0) * .35); }
+.exterior { opacity: calc(.58 + var(--scene-focus, 0) * .38); }
+.exterior > .neighbor { bottom: calc(var(--scene-focus, 0) * 18%); }
+.exterior > .neighbor:first-child { left: -4%; width: 25%; height: 67%; }
+.exterior > .neighbor:last-of-type { left: auto; right: -3%; width: 40%; height: 72%; }
+.oldBuilding { position: absolute; left: 20%; bottom: calc(var(--scene-focus, 0) * 18%); width: 40%; height: 83%; background: #a6a69d; border-top: 5px solid #8f9999; }
+.oldBuilding span { position: absolute; width: 17%; height: 15%; background: #819093; box-shadow: inset 1px 0 #c9c8b966, 0 2px #b9b9a8; }
+.oldBuilding span:nth-child(3n + 1) { left: 12%; }.oldBuilding span:nth-child(3n + 2) { left: 42%; }.oldBuilding span:nth-child(3n) { left: 72%; }
+.oldBuilding span:nth-child(-n + 3) { top: 11%; }.oldBuilding span:nth-child(n + 4):nth-child(-n + 6) { top: 34%; }.oldBuilding span:nth-child(n + 7) { top: 57%; }
+.oldBuilding span[data-old-window] { background: color-mix(in srgb, #819093, #424f52 calc(var(--cue-recognition, 0) * 100%)); }
+.oldBuilding span[data-old-window]::after { content: ''; position: absolute; left: 35%; right: 12%; top: 0; height: 100%; background: #a4aea7; opacity: calc(1 - var(--cue-recognition, 0) * .65); }
+.bank { bottom: 0; left: 7%; right: 7%; height: 16%; background: repeating-linear-gradient(0deg, #858a85 0 2px, #777f7d 3px 4px); border-top: 4px solid #9e9f93; }
+.street { left: 0; right: 0; bottom: 0; height: 18%; background: linear-gradient(#c2c3b9 0 57%, #a1a9a4 58% 61%, #aeb4ae 62%); opacity: var(--scene-focus, 0); }
+.manSlot { inset: 0; opacity: var(--scene-focus, 0); }
+.man { left: 39%; top: 81%; width: 5%; height: 13%; transform: translateY(calc(var(--cue-approach, 0) * 22%)) scale(calc(1 + var(--cue-approach, 0) * .22)); transform-origin: 50% 100%; transition: transform 900ms ease; }
+.man span { position: absolute; top: 0; left: 34%; width: 35%; height: 21%; background: #565b55; border-radius: 48%; transform: rotate(calc(-12deg + var(--cue-approach, 0) * 12deg)); }
+.man b { top: 20%; left: 17%; width: 70%; height: 56%; background: #525c59; clip-path: polygon(18% 0, 80% 0, 100% 100%, 0 100%); }
+/* Override the building-window fallback i styling for the distant figure. */
+.man i { top: 72%; bottom: auto; width: 15%; height: 29%; border: 0; background: #48534f; }
+.man i:nth-of-type(1) { left: 25%; transform: rotate(7deg); }.man i:nth-of-type(2) { right: 23%; left: auto; transform: rotate(-8deg); }
+.man::after { content: ''; position: absolute; right: 3%; top: 13%; width: 20%; height: 37%; border: 2px solid #525c59; border-left: 0; transform: rotate(-18deg); opacity: calc(1 - var(--cue-approach, 0)); }
+.onlookers { inset: 0; opacity: calc(var(--scene-focus, 0) * .55); }
+.onlookers span { position: absolute; bottom: 6%; width: 3%; height: 10%; border-radius: 40% 40% 15% 15%; background: #858b78; transform: rotate(calc(var(--cue-exposure, 0) * -7deg)); }
+.onlookers span:first-child { left: 14%; }.onlookers span:last-child { right: 10%; height: 8%; background: #9e9584; }
+.rugSlot, .furniture { opacity: calc(1 - var(--scene-focus, 0) * .12); }
+.illumination { opacity: var(--scene-light, 1); transition: opacity 700ms ease; }
+.sunlight { transform: translateX(calc(var(--scene-progress, 0) * 3px * (1 - var(--scene-focus, 0)) * (1 - var(--cue-still, 0)))); }
+.foreground { background: var(--scene-shadow, #455962); opacity: calc(var(--scene-focus, 0) * .1); }
+.coffee { opacity: calc(1 - var(--cue-spill, 0)); transition: opacity 200ms ease; }
+.disruption { inset: 0; z-index: 1; opacity: var(--cue-spill, 0); transition: opacity 450ms ease; }
+.spill { left: 49%; top: 85%; width: 9%; height: 3%; background: #887356; opacity: .52; border-radius: 47% 39% 54% 35%; transform: rotate(-8deg); }
+.fallenMug { left: 56%; top: 83%; width: 3.4%; height: 4.2%; background: #e1d9c5; border-top: 3px solid #8a7b65; border-radius: 20% 20% 40% 40%; transform: rotate(65deg); }
+.oldBuilding span[data-old-window], .oldBuilding span[data-old-window]::after { transition: background-color 650ms ease, opacity 650ms ease; }
+
+/* The Knock keeps this exact apartment, but closes its composition around the
+   threshold, the ordinary visitor and the memory board. */
+.canvas { transform-origin: 31% 55%; transition: transform 1100ms cubic-bezier(.2,.62,.3,1), filter 850ms ease; }
+.door, .board, .rug, .window, .furniture, .breakfast { transition: filter 700ms ease, opacity 700ms ease; }
+.interiorManSlot { inset: 0; z-index: 2; opacity: 0; pointer-events: none; transition: opacity 800ms ease; }
+.interiorMan { left: 27.5%; top: 27%; width: 12%; height: 42%; filter: saturate(.68); transform-origin: 50% 100%; transform: translateX(-3%); }
+.interiorMan span { position: absolute; display: block; left: 35%; top: 0; width: 31%; height: 15%; border-radius: 46% 48% 43% 45%; background: #796b5e; box-shadow: inset 5px -2px #544b46; }
+.interiorMan span::after { content: ''; position: absolute; left: 8%; right: -8%; bottom: -18%; height: 26%; background: repeating-linear-gradient(100deg, #4c4541 0 1px, transparent 1px 3px); opacity: .65; }
+.interiorMan b { left: 14%; top: 14%; width: 72%; height: 55%; background: linear-gradient(90deg, #4b5552, #626b66 58%, #48514e); clip-path: polygon(18% 0, 78% 0, 96% 100%, 3% 100%); box-shadow: inset 8px 0 #343d3b33; }
+.interiorMan i { top: 65%; width: 21%; height: 35%; background: #484b47; }
+.interiorMan i:nth-of-type(1) { left: 25%; transform: rotate(2deg); }
+.interiorMan i:nth-of-type(2) { right: 24%; transform: rotate(-2deg); }
+.interiorMan em { right: 5%; top: 21%; width: 19%; height: 43%; border-radius: 45%; background: #57615d; transform: rotate(-8deg); transform-origin: 50% 0; font-style: normal; }
+
+:global([data-active-scene='the-knock']) .canvas { transform: translate(-1.5%, -50%) scale(1.075); }
+:global([data-active-scene='the-knock']) .interiorManSlot { opacity: 1; }
+:global([data-active-scene='the-knock']) .window { filter: saturate(.66) brightness(.88); opacity: .72; }
+:global([data-active-scene='the-knock']) .door { filter: contrast(1.12) brightness(.92); }
+:global([data-active-scene='the-knock']) .board { filter: saturate(.86) contrast(1.1); box-shadow: 3px 5px 8px #3f40382b; }
+:global([data-active-scene='the-knock']) .foreground { opacity: .105; }
+
+/* Knowledge makes the same keepsakes feel flatter; shame makes them harsher.
+   No item is swapped or degraded. */
+:global([data-active-scene='the-knock']) .board { transform: scale(calc(1 + var(--cue-knowledge, 0) * .018)); transform-origin: 50% 50%; }
+:global([data-active-scene='the-knock']) .board i { filter: saturate(calc(.88 - var(--cue-knowledge, 0) * .28 - var(--cue-shame, 0) * .18)) contrast(calc(1.02 + var(--cue-shame, 0) * .16)); }
+:global([data-active-scene='the-knock']) .board { filter: saturate(calc(.86 - var(--cue-knowledge, 0) * .14 - var(--cue-shame, 0) * .18)) contrast(calc(1.1 + var(--cue-shame, 0) * .12)) brightness(calc(1 - var(--cue-shame, 0) * .06)); opacity: calc(1 - var(--cue-rugFocus, 0) * .2); }
+:global([data-active-scene='the-knock']) .rug { filter: saturate(calc(.72 - var(--cue-shame, 0) * .14)) contrast(calc(1.05 + var(--cue-rugFocus, 0) * .18)) brightness(calc(.94 - var(--cue-rugFocus, 0) * .07)); transform: skewX(-19deg) rotate(-3deg) scale(calc(1 + var(--cue-rugFocus, 0) * .035)); transform-origin: 55% 50%; }
+:global([data-active-scene='the-knock']) .spill { opacity: calc(.52 + var(--cue-rugFocus, 0) * .24); }
+:global([data-active-scene='the-knock']) .interiorMan { transform: translateX(calc(-3% + var(--cue-knowledge, 0) * -7%)); }
+
+/* The mobile intro owns an in-flow room, so it receives the complete static
+   threshold composition even before the page-level active scene updates. */
+:global([data-thought-scene='the-knock']) .environment { --scene-focus: 0; --cue-knowledge: 0; --cue-shame: 0; --cue-rugFocus: 0; }
+:global([data-thought-scene='the-knock']) .canvas { transform: translate(-1.5%, -50%) scale(1.075); }
+:global([data-thought-scene='the-knock']) .interiorManSlot { opacity: 1; }
+:global([data-thought-scene='the-knock']) .window { filter: saturate(.66) brightness(.88); opacity: .72; }
+:global([data-thought-scene='the-knock']) .board { filter: saturate(.86) contrast(1.1); }
+@media (prefers-reduced-motion: reduce) {
+  /* Retain the settled window composition and mood; never move a crop. */
+  .window { transition: none; }
+  .sunlight { transform: none; }
+  .canvas, .door, .board, .board i, .rug, .window, .furniture, .breakfast, .interiorManSlot, .interiorMan,
+  .man, .coffee, .disruption, .illumination, .oldBuilding span[data-old-window], .oldBuilding span[data-old-window]::after { transition: none; }
+}

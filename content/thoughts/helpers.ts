@@ -8,6 +8,8 @@ import type { Thought, ThoughtBlock } from './types'
 
 /** a thought with everything the interface derives from it, precomputed on the server */
 export interface ThoughtEntry extends Thought {
+  portal: NonNullable<Thought['portal']>
+  experience: NonNullable<Thought['experience']>
   index: number
   /** title split on '\n' — cover and title page */
   titleLines: string[]
@@ -25,6 +27,14 @@ export interface ThoughtEntry extends Thought {
 }
 
 const WORDS_PER_MINUTE = 230
+
+export function getPortalKind(thought: Thought): NonNullable<Thought['portal']>['kind'] {
+  return thought.portal?.kind ?? 'paper'
+}
+
+export function getExperienceKind(thought: Thought): NonNullable<Thought['experience']>['kind'] {
+  return thought.experience?.kind ?? 'reader'
+}
 
 export function splitLines(text?: string): string[] {
   if (!text) return []
@@ -82,6 +92,8 @@ export function prepareThoughts(thoughts: Thought[]): ThoughtEntry[] {
     const date = formatDate(thought.date)
     return {
       ...thought,
+      portal: { kind: getPortalKind(thought) },
+      experience: { ...thought.experience, kind: getExperienceKind(thought) },
       index,
       titleLines: splitLines(thought.title),
       plainTitle: joinLines(thought.title),

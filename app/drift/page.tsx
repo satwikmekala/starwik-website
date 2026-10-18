@@ -4,7 +4,7 @@ import DriftExperience from '@/components/DriftExperience'
 export const metadata: Metadata = {
   title: '★wik — Elsewhere',
   description:
-    'A scroll-driven cinematic journey through every place ★wik has ever traveled.',
+    'A personal atlas of places, journeys, and the things ★wik brought back.',
 }
 
 export default function ElsewherePage() {

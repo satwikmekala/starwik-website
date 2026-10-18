@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls } from 'framer-motion'
 
-import type { Mix } from '@/app/frequencies/mixes'
+import type { Mix } from '@/app/music/mixes'
 import { cx, useListening } from './context'
 import { morph, settle } from './motion'
 import styles from './listening.module.css'

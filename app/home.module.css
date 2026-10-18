@@ -1,0 +1,27 @@
+/* ── HOME ── (the worlds themselves live in components/planets/worlds.module.css) */
+.page {
+  height: 100svh;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem 1.5rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: #3a3d43;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* no film grain over the wikverse — space should read clean and deep */
+:global(body):has(.page)::after {
+  display: none;
+}

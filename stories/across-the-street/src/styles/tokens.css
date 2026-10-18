@@ -1,0 +1,67 @@
+/*
+ * Across the Street: design tokens.
+ *
+ * Two palettes of the SAME colors. `calm` is measured from the reference
+ * (docs/reference-notes.md §3). `dead` is the Stain chapter: drained, flat,
+ * desaturated variants. A single number, --distress (0 → 1), mixes between
+ * them, so every drawing (all fills are var(--token)) shifts together and
+ * the change is felt, not announced. Animate --distress on [data-ats].
+ *
+ * Contrast (WCAG, OKLab-mixed exactly as at runtime, distress 0 / .5 / 1):
+ *   text on cloud 14.7 / 13.0 / 11.4   text on sky   11.3 / 10.2 / 9.1
+ *   line on cloud  9.8 /  7.8 /  6.3   line on sky    7.5 /  6.1 / 5.0
+ *   cloud on line  9.8 /  7.8 /  6.3   (worst pair anywhere: 5.04:1)
+ */
+@property --distress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+[data-ats] {
+  /* calm (reference-measured) */
+  --sky-calm: #ccd9f8;
+  --line-calm: #0e27b6;
+  --cream-calm: #edebda;
+  --cloud-calm: #f7f6f0;
+  --text-calm: #29210c;
+  /* story accents: the two things that must read as themselves */
+  --coffee-calm: #7a4a26;
+  --berry-calm: #c8413a;
+
+  /* dead (The Stain) */
+  --sky-dead: #d2cbb8;
+  --line-dead: #444f6a;
+  --cream-dead: #dcd5c3;
+  --cloud-dead: #e7e2d5;
+  --text-dead: #2c2721;
+  --coffee-dead: #5f4a36;
+  --berry-dead: #8a6b60;
+
+  --distress: 0;
+  --sky: color-mix(in oklab, var(--sky-calm), var(--sky-dead) calc(var(--distress) * 100%));
+  --line: color-mix(in oklab, var(--line-calm), var(--line-dead) calc(var(--distress) * 100%));
+  --cream: color-mix(in oklab, var(--cream-calm), var(--cream-dead) calc(var(--distress) * 100%));
+  --cloud: color-mix(in oklab, var(--cloud-calm), var(--cloud-dead) calc(var(--distress) * 100%));
+  --text: color-mix(in oklab, var(--text-calm), var(--text-dead) calc(var(--distress) * 100%));
+  --coffee: color-mix(in oklab, var(--coffee-calm), var(--coffee-dead) calc(var(--distress) * 100%));
+  --berry: color-mix(in oklab, var(--berry-calm), var(--berry-dead) calc(var(--distress) * 100%));
+
+  /* type */
+  --font-story: 'ATS BDO Grotesk', 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  --font-accent: 'ATS Instrument Serif', 'Libre Baskerville', Georgia, serif;
+  --story-size: clamp(1.375rem, 1.05rem + 1.4vw, 2.5rem); /* 22 → 40px, measured range */
+  --story-leading: 1.2;
+  --story-tracking: -0.02em;
+  --accent-size: 1rem;
+  --ui-size: 0.875rem;
+
+  /* space */
+  --gutter: 16px;
+  --sheet-min: 220px;
+  --ease-quiet: cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  [data-ats] { --gutter: 32px; }
+}

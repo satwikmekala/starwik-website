@@ -12,10 +12,10 @@ const thought: Thought = {
   subtitle: 'the version of you that got comfortable\nis not the version of you that wanted this.',
   date: '2026-07',
   coverImage: {
-    // TEMPORARY photograph
-    src: '/images/front page.JPG',
-    alt: 'A crowded room at night, faces turned toward the booth',
-    position: 'center 35%',
+    src: '/images/thoughts-midnight-notebook.jpg',
+    alt: 'Moonlight falling across handwritten pages on a dark desk',
+    position: 'center center',
+    mobilePosition: '62% center',
   },
   body: [
     {

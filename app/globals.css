@@ -61,6 +61,10 @@ body::after {
   animation: grain 0.9s steps(1) infinite;
 }
 
+/* Elsewhere's glass needs a still, clean surface. Scoped to this route. */
+html[data-elsewhere='true'] body::after { display: none; }
+html[data-elsewhere='true'] { overscroll-behavior: none; }
+
 @keyframes grain {
   0%   { transform: translate(0, 0); }
   10%  { transform: translate(-2%, -3%); }
@@ -73,208 +77,6 @@ body::after {
   80%  { transform: translate(4%, -1%); }
   90%  { transform: translate(-2%, 2%); }
   100% { transform: translate(0, 0); }
-}
-
-/* ── HOME PAGE ── */
-.home-page {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.home-bg-image {
-  z-index: 0;
-  object-fit: cover;
-  object-position: center 25%;
-  filter: saturate(0.8) contrast(1.05) brightness(0.68);
-}
-
-.home-bg-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 65% 55% at 50% 42%, rgba(7, 7, 10, 0.18) 0%, rgba(7, 7, 10, 0.62) 72%, rgba(7, 7, 10, 0.92) 100%),
-    linear-gradient(to bottom, rgba(7, 7, 10, 0.5) 0%, rgba(7, 7, 10, 0.2) 45%, rgba(7, 7, 10, 0.82) 100%);
-}
-
-.home-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 3vw, 2rem);
-  padding: 0 1rem clamp(3rem, 10svh, 8rem);
-  z-index: 2;
-}
-
-.home-nav {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 1.5rem 0;
-  z-index: 2;
-}
-
-.site-id {
-  display: flex;
-  align-items: center;
-  font-size: 0.6rem;
-  letter-spacing: 0.25em;
-  color: var(--text-muted);
-}
-
-.nav-label {
-  font-size: 0.6rem;
-  letter-spacing: 0.25em;
-  color: var(--text-muted);
-}
-
-.hero-section {
-  text-align: center;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.hero-name {
-  display: flex;
-  justify-content: center;
-  font-family: var(--font-display), serif;
-  font-size: clamp(3.5rem, 14vw, 6rem);
-  font-weight: 300;
-  letter-spacing: 0.12em;
-  color: var(--text-primary);
-  line-height: 0;
-}
-
-.hero-logo-svg {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
-}
-
-.hero-logo-svg:hover {
-  transform: scale(1.04) translateY(-2px);
-  filter: drop-shadow(0 0 15px rgba(255, 203, 42, 0.35)) drop-shadow(0 0 30px rgba(255, 255, 255, 0.08));
-}
-
-.hero-sub {
-  font-size: 0.6rem;
-  letter-spacing: 0.25em;
-  color: var(--text-muted);
-  text-transform: lowercase;
-  line-height: 1.6;
-}
-
-.hero-sub--question {
-  color: var(--text-secondary);
-  opacity: 0.6;
-  margin-top: 0.15rem;
-}
-
-.hero-rule {
-  width: 2rem;
-  height: 1px;
-  background: var(--border-accent);
-  margin: 1.5rem auto 0;
-}
-
-/* ── PORTAL GRID ── */
-.portals-section {
-  width: 100%;
-  max-width: 600px;
-  z-index: 2;
-}
-
-.portals-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(0.5rem, 1.5vw, 0.75rem);
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* ── PORTAL CARD ── */
-.portal-card {
-  border-radius: 1rem;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid var(--border-subtle);
-  position: relative;
-  transition: border-color 0.12s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.portal-card:hover {
-  border-color: var(--border-accent);
-}
-
-.portal-visual {
-  height: clamp(56px, 10svh, 160px);
-  position: relative;
-  overflow: hidden;
-}
-
-.portal-info {
-  padding: 0.85rem 0.9rem 1rem;
-  background: rgba(7, 7, 10, 0.7);
-  backdrop-filter: blur(4px);
-}
-
-.portal-number {
-  display: block;
-  font-size: 0.55rem;
-  letter-spacing: 0.2em;
-  color: var(--text-muted);
-  margin-bottom: 0.3rem;
-}
-
-.portal-name {
-  font-family: var(--font-display), serif;
-  font-size: 0.95rem;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  color: var(--text-primary);
-  margin-bottom: 0.4rem;
-  line-height: 1.2;
-}
-
-.portal-desc {
-  font-size: 0.55rem;
-  letter-spacing: 0.1em;
-  line-height: 1.7;
-  color: var(--text-muted);
-}
-
-.portal-enter {
-  display: block;
-  font-size: 0.5rem;
-  letter-spacing: 0.2em;
-  margin-top: 0.6rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.portal-card:hover .portal-enter {
-  opacity: 1;
-}
-
-/* ── HOME FOOTER ── */
-.home-footer {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 1.5rem 1.5rem 0;
-  font-size: 0.55rem;
-  letter-spacing: 0.2em;
-  color: var(--text-muted);
-  z-index: 2;
 }
 
 /* ── UNIVERSE PAGES ── */
@@ -557,21 +359,6 @@ html[data-thoughts='read'] body {
 html[data-thoughts='read'] body::after {
   opacity: 0.035;
   animation: none;
-}
-
-/* ── RESPONSIVE ── */
-@media (min-width: 1024px) {
-  .portals-section {
-    max-width: 960px;
-  }
-
-  .portals-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .portal-visual {
-    height: clamp(160px, 22svh, 220px);
-  }
 }
 
 /* ── REDUCED MOTION ── */

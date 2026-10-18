@@ -1,22 +1,24 @@
 import { Metadata } from 'next'
 
 import StarField from '@/components/StarField'
-import { WikLogo } from '@/components/WikLogo'
-import { HomePortals } from '@/components/HomePortals'
+import { HomeWorlds, type World } from '@/components/planets/HomeWorlds'
+import styles from './home.module.css'
 
 export const metadata: Metadata = {
   title: '★wik',
   description: 'DJ · Builder · Drifter · Mid-Transmission',
 }
 
-const portals = [
+const worlds: World[] = [
   {
     id: 'signal',
     number: '01',
     name: 'Frequencies',
-    descriptor: 'sets, mixes,\nthe whole journey',
-    href: '/frequencies',
-    accentColor: '#C45A18',
+    descriptor: 'sets, mixes, the whole journey',
+    href: '/music',
+    kind: 'music',
+    seed: 1,
+    accent: '#FF7A33',
   },
   {
     id: 'drift',
@@ -24,7 +26,9 @@ const portals = [
     name: 'Elsewhere',
     descriptor: "everywhere i've been",
     href: '/drift',
-    accentColor: '#B07820',
+    kind: 'travel',
+    seed: 2,
+    accent: '#FFC061',
   },
   {
     id: 'thoughts',
@@ -32,40 +36,29 @@ const portals = [
     name: 'thoughts',
     descriptor: "whatever's on my mind",
     href: '/thoughts',
-    accentColor: '#4858C8',
+    kind: 'thoughts',
+    seed: 3,
+    accent: '#8F9BFF',
+    italic: true,
   },
   {
     id: 'construct',
     number: '04',
     name: 'The Making',
     descriptor: "what i'm building and why",
-    href: '/construct',
-    accentColor: '#0F7A6A',
+    href: '/making',
+    kind: 'building',
+    seed: 4,
+    accent: '#45F0C6',
   },
 ]
 
 export default function Home() {
   return (
-    <main className="home-page">
-
+    <main className={styles.page}>
       <StarField />
-
-
-      <div className="home-content">
-        <section className="hero-section">
-          <h1 className="hero-name">
-            <WikLogo size="clamp(140px, 28vw, 210px)" className="hero-logo-svg" />
-          </h1>
-          <p className="hero-sub">welcome to the wikverse.</p>
-          <p className="hero-sub hero-sub--question">which world would you like to explore?</p>
-        </section>
-
-        <section className="portals-section">
-          <HomePortals portals={portals} />
-        </section>
-      </div>
-
-      <footer className="home-footer">
+      <HomeWorlds worlds={worlds} />
+      <footer className={styles.footer}>
         <span>STARWIK.COM</span>
         <span>© {new Date().getFullYear()}</span>
       </footer>

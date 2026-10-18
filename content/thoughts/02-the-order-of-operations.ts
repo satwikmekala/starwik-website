@@ -12,10 +12,10 @@ const thought: Thought = {
   subtitle: 'meaning is not extracted.\nit settles.',
   date: '2026-06',
   coverImage: {
-    // TEMPORARY photograph
-    src: '/images/The RU EXPERIENCE.jpg',
-    alt: 'A dark room, screens glowing, hands raised toward the light',
-    position: 'center 38%',
+    src: '/images/thoughts-midnight-notebook.jpg',
+    alt: 'Moonlight falling across handwritten pages on a dark desk',
+    position: 'center center',
+    mobilePosition: '62% center',
   },
   body: [
     {

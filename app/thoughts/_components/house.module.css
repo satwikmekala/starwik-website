@@ -1,0 +1,599 @@
+/* A fragment of an apartment, lit from within. No image assets or extra clock.
+   Material colors and depth live here so final art can replace these surfaces. */
+.stage {
+  --house-width: min(330px, 34vw, 46svh);
+  --house-depth: 32px;
+  --plaster: #625e53;
+  --recess: #28221b;
+  --entry-attention: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.65s var(--th-ease-fade);
+  animation: discover 0.9s var(--th-ease-fade) both;
+}
+
+.stage[data-state='read'],
+.stage[data-state='missing'] { opacity: 0; }
+
+.stage[data-state='archive'] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 54% 52% at 50% 50%, rgba(4, 6, 11, 0.44), rgba(3, 5, 10, 0.92)),
+    #050806;
+  opacity: 0.92;
+  transition: opacity 1.3s var(--th-ease-fade);
+}
+
+:is([data-state='portal'], [data-entry-phase]) .atmosphere { opacity: 1; }
+
+.composition {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--house-width);
+  aspect-ratio: 1.12;
+  transform: translate(-50%, -50%) scale(0.64);
+  transition: transform 1.7s var(--th-ease-out);
+
+}
+
+/* Approach using one transform; archive layout and geometry never move. */
+:is([data-state='portal'], [data-entry-phase]) .composition {
+  transform: translate(-50%, -50%) scale(1.17);
+}
+
+.camera { position: absolute; inset: 0; transform-origin: center; }
+
+.control {
+  display: block;
+  position: absolute;
+  inset: 0;
+  color: var(--th-light);
+  text-decoration: none;
+  pointer-events: auto;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.control:focus-visible .window {
+  outline: 1px solid rgba(242, 216, 166, 0.7);
+  outline-offset: 5px;
+}
+
+.motion, .building {
+  position: absolute;
+  inset: 0;
+  transform-style: flat;
+}
+
+/* One painted 2D object: no intersecting GPU planes or depth sorting.
+   Keep the engine's existing pointer variables, but not its 3D rotation. */
+.motion {
+  transform: translate(calc(var(--house-look-x, 0) * .7px), calc(var(--house-look-y, 0) * .5px)) !important;
+}
+
+.building {
+  transform: skewY(2.5deg) scaleX(.94);
+  transition: transform 1.6s var(--th-ease-out);
+}
+
+:is([data-state='portal'], [data-entry-phase]) .building { transform: skewY(2deg) scaleX(.96); }
+
+.facade {
+  position: absolute;
+  inset: 0;
+  transform: none;
+  background-color: var(--plaster);
+  background-image:
+    linear-gradient(116deg, rgba(239, 225, 198, 0.16), transparent 40%, rgba(34, 32, 27, 0.25)),
+    var(--th-paper-surface);
+  background-size: auto, auto, auto, 240px 240px, 600px 600px;
+  box-shadow: inset 0 1px rgba(234, 224, 201, 0.38), inset 1px 0 rgba(227, 214, 187, 0.15);
+}
+
+/* Quiet weathering, without adding photographic texture downloads. */
+.facade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 12%, rgba(41, 34, 23, 0.07) 12.4%, transparent 13.3%),
+    linear-gradient(90deg, transparent 85%, rgba(239, 221, 185, 0.07) 85.4%, transparent 86%),
+    linear-gradient(0deg, rgba(23, 26, 23, 0.18), transparent 22%);
+}
+
+.side {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: calc(var(--house-depth) * .55);
+  height: calc(100% + 12px);
+  top: -12px;
+  clip-path: polygon(0 12px, 100% 0, 100% calc(100% - 12px), 0 100%);
+  background: linear-gradient(90deg, #514c42, #302f2b);
+  box-shadow: inset 0 1px rgba(217, 204, 179, 0.16);
+}
+
+.roof {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  width: calc(100% + var(--house-depth) * .55);
+  height: 12px;
+  clip-path: polygon(0 100%, calc(var(--house-depth) * .55) 0, 100% 0, calc(100% - var(--house-depth) * .55) 100%);
+  background: linear-gradient(180deg, #b2a995, #7c7567);
+  box-shadow: inset 0 0 0 1px rgba(33, 29, 23, 0.15);
+}
+
+.cornice {
+  position: absolute;
+  inset: 7% 0 auto;
+  height: 3%;
+  background: linear-gradient(#b1a692, #8b806e 60%, #5c574d);
+  box-shadow: 0 3px 4px rgba(25, 22, 18, 0.13);
+}
+
+.window {
+  position: absolute;
+  left: 28%;
+  top: 25%;
+  width: 48%;
+  height: 54%;
+  padding: 8px 9px 10px 12px;
+  background: var(--recess);
+  box-shadow: -1px -1px 0 rgba(30, 26, 20, 0.48), 1px 2px 0 rgba(226, 208, 172, 0.4);
+}
+
+.room {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(105deg, #755036, #c5955c 30%, #e1b574 64%, #a07445);
+  box-shadow: inset 8px 6px 15px rgba(58, 32, 15, 0.34);
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(110deg, transparent 20%, rgba(255, 234, 173, 0.65) 20.5%, rgba(255, 225, 155, 0.12) 65%, transparent 65.5%),
+    linear-gradient(0deg, rgba(247, 203, 115, 0.2), transparent 70%);
+  opacity: 0.57;
+  transition: opacity 0.8s ease;
+}
+
+.floor {
+  position: absolute;
+  inset: 67% 0 0;
+  background: linear-gradient(165deg, #9d7548, #d5aa69 48%, #957040);
+  border-top: 1px solid rgba(110, 70, 36, 0.24);
+}
+
+.rug {
+  position: absolute;
+  left: 21%;
+  bottom: 4%;
+  width: 60%;
+  height: 20%;
+  transform: skewX(-29deg);
+  background: repeating-linear-gradient(90deg, transparent 0 5px, rgba(74, 46, 24, 0.06) 5px 6px), #b79468;
+  border: 2px solid rgba(226, 196, 144, 0.55);
+  box-shadow: 0 2px 1px rgba(76, 48, 22, 0.2);
+}
+
+.curtain {
+  position: absolute;
+  inset: 0 auto 9% 0;
+  width: 17%;
+  background: linear-gradient(90deg, #9b754b, #e1c28b 40%, #b28b5b 63%, #e9c997);
+  clip-path: polygon(0 0, 100% 0, 65% 63%, 80% 100%, 0 100%);
+  opacity: 0.84;
+}
+
+.plant {
+  position: absolute;
+  right: 13%;
+  bottom: 19%;
+  width: 8%;
+  height: 12%;
+  background: #6c5940;
+  border-radius: 0 0 25% 25%;
+}
+
+.plant::before, .plant::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  width: 130%;
+  height: 125%;
+  border-radius: 80% 0 80% 0;
+  background: #4f5535;
+  transform-origin: bottom;
+}
+.plant::before { left: -50%; transform: rotate(-32deg); }
+.plant::after { left: 30%; transform: rotate(24deg) scale(0.85); }
+
+.frame {
+  position: absolute;
+  inset: 6px 7px 8px 10px;
+  border: 3px solid #554533;
+  box-shadow: inset 1px 0 #b69a6b, 1px 0 #c0a675;
+}
+.frame::before, .frame::after { content: ''; position: absolute; background: #574834; }
+.frame::before { top: 0; bottom: 0; left: 48%; width: 5px; box-shadow: 1px 0 #b19467, 4px 0 6px rgba(37, 28, 17, 0.2); }
+.frame::after { left: 0; right: 0; top: 29%; height: 4px; box-shadow: 0 1px #b19467; }
+
+.sill {
+  position: absolute;
+  left: -7%;
+  right: -7%;
+  bottom: -7px;
+  height: 11px;
+  background: linear-gradient(#c4b497 0 36%, #8b7c62 39% 80%, #635b4c 85%);
+  box-shadow: 0 5px 5px rgba(30, 26, 19, 0.3);
+}
+
+.seam { position: absolute; left: 17%; top: 10%; bottom: 3%; width: 1px; background: rgba(55, 48, 37, 0.16); }
+.base { position: absolute; inset: auto -1px 0; height: 4%; background: linear-gradient(#746e61, #5d594f); border-top: 1px solid rgba(209, 192, 158, 0.26); }
+
+.shadow {
+  position: absolute;
+  width: 145%;
+  height: 26%;
+  left: -15%;
+  top: 101%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.25) 38%, transparent 69%);
+  transform: rotate(-5deg);
+  opacity: 0.55;
+  transition: opacity 1.1s ease;
+}
+:is([data-state='portal'], [data-entry-phase]) .shadow { opacity: 0.95; }
+:is([data-state='portal'], [data-entry-phase]) .light { opacity: 0.85; }
+.control:focus-visible .light { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .control:hover .light { opacity: 1; }
+}
+
+.caption {
+  position: absolute;
+  top: calc(100% + 60px);
+  left: -20%;
+  width: 140%;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.65s ease;
+}
+:is([data-state='portal'], [data-entry-phase]) .caption { opacity: 1; pointer-events: auto; transition-delay: 0.35s; }
+:is([data-state='portal'], [data-entry-phase]) .title {
+  animation: titleRest 1.4s var(--th-ease-out) 0.9s both;
+}
+:is([data-state='portal'], [data-entry-phase]) .number { opacity: 0.65; }
+:is([data-state='portal'], [data-entry-phase]) .invitation { opacity: 0.72; }
+.number { font-family: var(--th-mono); font-size: 9px; letter-spacing: 0.24em; color: var(--th-light-faint); }
+.title { font-family: var(--th-serif); font-size: clamp(30px, 3vw, 42px); font-weight: 300; font-style: italic; line-height: 1; opacity: 0.74; transform: translateY(-3px); }
+.invitation { display: flex; align-items: center; gap: 12px; margin-top: 9px; font-family: var(--th-serif); font-size: 14px; letter-spacing: 0.12em; color: var(--th-light-soft); }
+.invitation svg { width: 24px; height: auto; }
+
+/* The room moves behind a fixed recess and glass. In the archive the added
+   layers are transparent and the interior has the same bounds as Slice 2. */
+.interior { position: absolute; inset: 0; transition: transform 0.35s var(--th-ease-out); }
+.interior::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(108deg, rgba(247, 211, 145, 0.13), rgba(255, 229, 173, 0.56) 62%, rgba(247, 191, 104, 0.28));
+  opacity: 0;
+  transition: opacity 1.25s var(--th-ease-fade);
+}
+
+.glass {
+  position: absolute;
+  inset: 9px 10px 11px 13px;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 12%, rgba(255, 239, 198, 0.25) 12.4%, transparent 38%),
+    linear-gradient(175deg, rgba(70, 64, 52, 0.3), transparent 26%, rgba(255, 218, 147, 0.13));
+  box-shadow: inset 6px 3px 8px rgba(32, 23, 15, 0.3);
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.window::before {
+  content: '';
+  position: absolute;
+  inset: -33% -40%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, rgba(237, 185, 105, 0.25), rgba(227, 168, 81, 0.07) 48%, transparent 71%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+/* Readiness is just CSS focus/hover: no timer, dwell, route change or state
+   to carry back into the archive. Brightness always comes from the room. */
+.stage:is([data-state='portal'], [data-entry-phase]):has(.control:focus-visible) { --entry-attention: 1; }
+:is([data-state='portal'], [data-entry-phase]) .interior {
+  transition: none;
+  transform: translate(
+    calc(var(--house-look-x, 0) * (1.5px + var(--entry-attention) * 0.75px)),
+    calc(var(--house-look-y, 0) * (1px + var(--entry-attention) * 0.5px)));
+}
+:is([data-state='portal'], [data-entry-phase]) .interior::before { opacity: calc(0.8 + var(--entry-attention) * 0.2); }
+:is([data-state='portal'], [data-entry-phase]) .glass { opacity: calc(0.45 + var(--entry-attention) * 0.15); }
+:is([data-state='portal'], [data-entry-phase]) .window::before { opacity: calc(0.72 + var(--entry-attention) * 0.28); }
+
+/* A little more shade at attention, without changing the archive backdrop. */
+.atmosphere::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 43%, transparent 15%, rgba(2, 3, 7, 0.3) 80%);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+:is([data-state='portal'], [data-entry-phase]) .atmosphere::after { opacity: calc(0.35 + var(--entry-attention) * 0.45); }
+
+@media (hover: hover) and (pointer: fine) {
+  .stage:is([data-state='portal'], [data-entry-phase]):has(.control:hover) { --entry-attention: 1; }
+}
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  :is([data-state='portal'], [data-entry-phase]) .building {
+    transform: skewY(2deg) scaleX(.96) scale(calc(1 + var(--entry-attention) * .008));
+  }
+}
+
+/* Only the house's focused state quiets the surrounding map. It remains
+   discoverable on hover/focus and restores automatically on Back/unmount. */
+@media (min-width: 768px) {
+  :global([data-thoughts-view='portal']):has(.stage) :global([data-selector]) { opacity: 0.34; }
+  :global([data-thoughts-view='portal']):has(.stage) :global([data-selector]):is(:hover, :focus-within) { opacity: 0.9; }
+}
+
+@keyframes titleRest {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0.74; transform: translateY(-3px); }
+}
+
+@media (max-width: 767px) {
+  .stage { --house-width: min(56vw, 34svh, 280px); --house-depth: 20px; }
+  .composition { left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.74); }
+  :is([data-state='portal'], [data-entry-phase]) .composition { transform: translate(-50%, -50%) scale(1.18); }
+  .building, :is([data-state='portal'], [data-entry-phase]) .building { transform: skewY(1.5deg) scaleX(.97); }
+  .motion { transform: none !important; will-change: auto; }
+  .window { padding: 5px 6px 7px 8px; }
+  .frame { inset: 4px 4px 6px 6px; border-width: 2px; }
+  .frame::before { width: 3px; }
+  .frame::after { height: 3px; }
+  .caption { top: calc(100% + 44px); gap: 14px; }
+  .title { font-size: clamp(26px, 7.5vw, 33px); }
+  :is([data-state='portal'], [data-entry-phase]) .interior { transform: none; }
+  .glass { inset: 6px 6px 8px 8px; }
+  .control:focus-visible .window { outline-offset: 4px; }
+}
+
+@media (max-height: 560px) and (min-width: 768px) {
+  .stage { --house-width: 42svh; --house-depth: 20px; }
+  :is([data-state='portal'], [data-entry-phase]) .composition { transform: translate(-50%, -50%) scale(1.12); }
+  .caption { top: calc(100% + 25px); gap: 9px; }
+  .title, :is([data-state='portal'], [data-entry-phase]) .title { font-size: 28px; }
+  .invitation { margin-top: 0; }
+}
+
+@media (hover: none), (pointer: coarse) {
+  :is([data-state='portal'], [data-entry-phase]) .interior { transform: none; }
+}
+
+@keyframes discover { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .stage { animation: none; transition: opacity 0.3s ease; }
+  .composition, .building { transition: none; }
+  :is([data-state='portal'], [data-entry-phase]) .interior { transform: none; }
+  .title, :is([data-state='portal'], [data-entry-phase]) .title { animation: none; opacity: 0.74; transform: none; }
+  .interior { transition: none; }
+  .interior::before, .glass, .window::before, .atmosphere::after { transition: opacity 0.3s ease; }
+  .motion { transform: none !important; will-change: auto; }
+  .caption, :is([data-state='portal'], [data-entry-phase]) .caption, .light, .shadow, .atmosphere { transition: opacity 0.3s ease; }
+}
+
+/* Architectural finish. These selectors only dress the miniature; the shared
+   room used by the opening and transition handoff retains its original art. */
+.facade {
+  background-image:
+    radial-gradient(ellipse at 52% 52%, #c19e6520, transparent 58%),
+    linear-gradient(112deg, #c8c3ae24, transparent 36%, #151b2180),
+    var(--th-paper-surface);
+  background-size: auto, auto, auto, auto, 180px 180px, 430px 430px;
+  box-shadow: inset 0 1px #e1d2ac70, inset 2px 0 #c7c0a72b, inset -2px 0 #171b1b70,
+    0 12px 24px #00000030;
+}
+.facade::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23g)' opacity='.55' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  /* Normal alpha avoids blend-layer cutouts during camera scaling. */
+  opacity: .09;
+}
+.facade::after {
+  background:
+    radial-gradient(ellipse at 0 100%, #090d14a6, transparent 43%),
+    radial-gradient(ellipse at 100% 5%, #11151d54, transparent 35%),
+    linear-gradient(0deg, #15191b6b, transparent 23%);
+}
+.side {
+  background: linear-gradient(0deg, #10151be0, transparent 60%),
+    linear-gradient(90deg, #45453e, #252a2c);
+  box-shadow: inset 1px 0 #b6af9133, inset 0 1px #c5bda147;
+}
+.roof { background: linear-gradient(160deg, #8c8978, #4b4d47); }
+.cornice {
+  inset: 5% -2% auto;
+  height: 3.5%;
+  transform: none;
+  background: linear-gradient(#b3aa90 0 12%, #777364 20% 64%, #44463f 70%);
+  box-shadow: 0 5px 5px #10131045, 0 1px #181d1b;
+}
+.pier {
+  position: absolute;
+  inset: 8.5% auto 7% 7%;
+  width: 9%;
+  background: linear-gradient(90deg, #b6ac8912, #d6c5a009 86%, #151a1930);
+  border-left: 1px solid #d2c4a218;
+  box-shadow: 2px 0 3px #11171924;
+}
+.lintel {
+  position: absolute;
+  left: 25%;
+  top: 20%;
+  width: 56%;
+  height: 4%;
+  background: linear-gradient(#b7aa8938, #777263 70%, #343932);
+  border-top: 1px solid #ddd0af3b;
+  box-shadow: 0 4px 5px #171b1940;
+}
+.seam { left: 19%; background: #151b1820; }
+.base {
+  height: 7%;
+  background: linear-gradient(#5a5b50 0 14%, #333a35 18% 26%, #55574d 30%, #303733);
+  border-top-color: #c4b99b38;
+}
+.window {
+  left: 28%; top: 25%; width: 49%; height: 55%;
+  padding: 12px 8px 9px 15px;
+  background: linear-gradient(120deg, #151b1c, #302c23 52%, #aa8651);
+  box-shadow: -1px -1px 1px #121815, 1px 1px #b9a47c80, inset 7px 6px 7px #070e1480;
+}
+.window .room {
+  background: linear-gradient(107deg, #392f27, #876544 30%, #c29a64 66%, #765b3c);
+  box-shadow: inset 10px 9px 14px #261c1794, inset -3px -2px 7px #f6d49c38;
+}
+.window .interior { inset: -3px; }
+.window .interior::before {
+  background: radial-gradient(ellipse at 68% 34%, #ffe1a583, transparent 70%);
+}
+.window .light {
+  background: linear-gradient(114deg, transparent 20%, #ffdf9a30 21%, #e9bb7020 67%, transparent 68%);
+}
+.window .floor { background: linear-gradient(160deg, #69533a, #ad8b5c 56%, #594b38); }
+.window .rug { opacity: .4; }
+.window .curtain {
+  width: 24%; opacity: .78;
+  background: repeating-linear-gradient(92deg, #b59a6a88 0%, #ead6aeb0 12%, #79624580 25%, #d4b98b99 39%);
+  clip-path: polygon(0 0, 100% 0, 88% 46%, 76% 100%, 0 100%);
+}
+.window .plant { right: 17%; background: #5c503c; transform: scale(.8); }
+.window .plant::before, .window .plant::after { background: #3f4833; }
+.frame {
+  inset: 9px 6px 7px 12px;
+  border-color: #403c31;
+  box-shadow: inset 1px 1px #d5b87d80, 1px 1px #ddbb7d66, -2px -2px 3px #161b1780;
+}
+.frame::before { width: 4px; background: #403c31; box-shadow: 1px 0 #cfad7277, 4px 1px 5px #271e184a; }
+.frame::after { top: 25%; height: 3px; background: #4a4132; box-shadow: 0 1px #d5b57980; }
+.glass {
+  inset: 12px 9px 10px 15px;
+  background: linear-gradient(121deg, #bccbd318, transparent 27% 62%, #e0cda81f 63%, transparent 66%),
+    linear-gradient(0deg, #c9994c12, transparent 50%, #131e264a);
+  box-shadow: inset 6px 5px 10px #151a204f;
+}
+.sill {
+  left: -9%; right: -9%; bottom: -8px; height: 13px;
+  transform: none;
+  background: linear-gradient(175deg, #c8b48b 0 25%, #a19272 32% 42%, #6c6652 46% 76%, #494d41 80%);
+  box-shadow: 0 7px 5px #0d151b70, 0 16px 17px #ddb26a12;
+}
+.sill::after {
+  content: ''; position: absolute; left: 5%; right: 5%; top: 100%; height: 22px;
+  background: radial-gradient(ellipse at 50% 0, #e8b96b2b, transparent 72%);
+}
+.window::before {
+  background: radial-gradient(ellipse at 55% 68%, #efbb672e, #ce9b4710 47%, transparent 69%);
+}
+.memoryVeil {
+  position: absolute; inset: -1px; pointer-events: none; overflow: hidden;
+}
+.memoryVeil::before {
+  content: ''; position: absolute; inset: -25% -55%;
+  background: radial-gradient(ellipse at 30% 35%, #080f1980, transparent 43%),
+    radial-gradient(ellipse at 62% 80%, #0e15208c, transparent 39%),
+    radial-gradient(ellipse at 48% 54%, #d0ae651f, transparent 31%);
+  opacity: .12; transform: translateX(-16%) rotate(-12deg);
+}
+.motes {
+  position: absolute; inset: -17% -20%; pointer-events: none; opacity: .28;
+  background: radial-gradient(circle at 20% 28%, #e4c58c80 0 .6px, transparent 1px),
+    radial-gradient(circle at 76% 63%, #e4c58c66 0 .6px, transparent 1px),
+    radial-gradient(circle at 84% 40%, #e4c58c66 0 .5px, transparent 1px),
+    radial-gradient(ellipse at 66% 76%, #d4b06d0a, transparent 46%);
+}
+.caption { top: calc(100% + 48px); gap: 13px; }
+.title { font-size: clamp(27px, 2.6vw, 34px); }
+.invitation { font-size: 12px; }
+@media (prefers-reduced-motion: no-preference) {
+  .stage:is([data-state='portal'], [data-entry-phase]) .memoryVeil::before { animation: memoryPass 31s ease-in-out infinite; }
+  .stage[data-state='portal']:not([data-entry-phase]) .window .light { animation: roomBreath 11s ease-in-out infinite; }
+  .stage[data-state='portal']:not([data-entry-phase]) .shadow { animation: shadowDrift 23s ease-in-out infinite alternate; }
+}
+@keyframes memoryPass {
+  0%, 18%, 100% { opacity: .08; transform: translateX(-16%) rotate(-12deg); }
+  42% { opacity: .32; }
+  65% { opacity: .18; transform: translateX(17%) rotate(7deg); }
+  79% { opacity: .06; transform: translateX(19%) rotate(9deg); }
+}
+@keyframes roomBreath { 0%, 100% { opacity: .66; } 53% { opacity: .83; } }
+@keyframes shadowDrift { from { transform: translateX(-2px) rotate(-5deg); } to { transform: translateX(3px) rotate(-3deg); } }
+@media (max-width: 767px) {
+  .window { padding: 8px 6px 7px 10px; }
+  .frame { inset: 6px 4px 5px 8px; }
+  .glass { inset: 8px 6px 7px 10px; }
+  .sill { height: 10px; bottom: -6px; }
+  .caption { top: calc(100% + 38px); }
+}
+@media (max-height: 560px) and (min-width: 768px) {
+  .caption { top: calc(100% + 25px); gap: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage, .stage *, .stage *::before, .stage *::after { animation: none !important; transition: none !important; }
+}
+
+/* The retained artifact rises above the already-mounted story only during entry. */
+.stage[data-entry-phase] { z-index: 8; transition: none; animation: none; }
+.stage[data-entry-phase] * { transition: none; }
+.stage[data-entry-phase] .control { pointer-events: none; outline: none; }
+.stage[data-entry-phase] .window { outline: none; }
+.stage[data-state='read']:not([data-entry-phase]) { visibility: hidden; }
+.entryBloom { position: absolute; inset: 0; background: #eee5d6; opacity: 0; pointer-events: none; }
+.handoff { background: #eee5d6; position: fixed; inset: 0; z-index: 9; opacity: 0; pointer-events: none; overflow: hidden; }
+.openRoom { position: absolute; inset: 0; width: 100%; height: 100%; box-shadow: none; }
+.openRoom .interior { transform: none; transition: none; }
+.openRoom .interior::before { opacity: .8; transition: none; }
+.openRoom .light { opacity: .85; transition: none; }
+
+.stage[data-state='read'],
+.stage[data-state='read'] *,
+.stage[data-state='read'] *::before,
+.stage[data-state='read'] *::after { transition: none; animation: none; }
+:global([data-thoughts-view='read']):has(.stage) { background: #e8d3ac; }
+
+/* Preserve the veil's current frame during entry instead of resetting its
+   shading when the route changes beneath the retained architecture. */
+@media (prefers-reduced-motion: no-preference) {
+  .stage[data-entry-phase] .memoryVeil::before {
+    animation: memoryPass 31s ease-in-out infinite;
+    animation-play-state: paused;
+  }
+}

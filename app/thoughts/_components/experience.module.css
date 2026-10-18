@@ -32,6 +32,7 @@
 
   position: relative;
   min-height: 100svh;
+  background: #050a06;
   color: var(--th-light);
   font-family: var(--th-serif);
   -webkit-font-smoothing: antialiased;
@@ -50,6 +51,36 @@
   border: 0;
 }
 
+/* The index is a normal document; the persistent portal retains its room. */
+.root[data-thoughts-view='archive'] {
+  background: #0b0d14;
+}
+
+.root[data-thoughts-view='archive'] .archive,
+.root[data-thoughts-view='archive'] .titleSlot {
+  position: relative;
+  inset: auto;
+}
+
+.root[data-thoughts-view='archive'] .atmos,
+.root[data-thoughts-view='archive'] .deep,
+.root[data-thoughts-view='archive'] .selectorSlot,
+.root[data-thoughts-view='archive'] .chrome {
+  display: none;
+}
+
+.root:not([data-thoughts-view='archive']) .titleSlot {
+  display: none;
+}
+
+/* Covers stay mounted for their existing transitions, but cannot cover or
+   receive focus from the archive, including the house portal. */
+.root[data-thoughts-view='archive'] > :global([data-house-portal]),
+.root[data-thoughts-view='archive'] > :global([data-house-handoff]) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* ── THE PHOTOGRAPH ── */
 
 .backdrop {
@@ -60,6 +91,14 @@
   pointer-events: none;
   transform-origin: 50% 46%;
   transition: transform 1.6s var(--th-ease-camera);
+}
+
+[data-thoughts-view='archive'] .backdrop {
+  opacity: 0;
+  transform: scale(1.02);
+  transition:
+    opacity 0.7s var(--th-ease-fade),
+    transform 1.2s var(--th-ease-out);
 }
 
 /* stepping into a thought moves the camera slowly forward */
@@ -156,6 +195,12 @@
     linear-gradient(180deg, rgba(4, 6, 13, 0.46) 0%, transparent 20%, transparent 68%, rgba(4, 6, 13, 0.58) 100%);
 }
 
+[data-thoughts-view='archive'] .atmos {
+  background:
+    radial-gradient(ellipse 72% 62% at 39% 43%, rgba(24, 36, 25, 0.12), transparent 66%),
+    linear-gradient(180deg, rgba(2, 7, 3, 0.05), rgba(1, 5, 2, 0.42));
+}
+
 [data-thoughts-view='read'] .atmos {
   opacity: 0;
 }
@@ -198,6 +243,15 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+.selectorSlot {
+  opacity: 0;
+  transition: opacity 0.72s var(--th-ease-fade) 0.15s;
+}
+
+[data-thoughts-view='portal'] .selectorSlot {
+  opacity: 1;
 }
 
 /* ── THE SHEET — the card's paper, grown to the edges of the world ── */

@@ -1,0 +1,55 @@
+.margins {
+  --pencil: #acc7e8;
+  --starlight: #e4bd79;
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  color: var(--pencil);
+}
+
+/* The strips protect the text column; each chapter scatters its own marks. */
+.field {
+  position: absolute;
+  top: 88px;
+  bottom: 104px;
+  width: calc((100vw - 640px) / 2);
+}
+.field[data-side='left'] { left: 0; }
+.field[data-side='right'] { right: 0; }
+.doodle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: min(var(--size), 68%);
+  translate: -50% -50%;
+  transform: rotate(var(--rotation));
+  opacity: 0;
+  /* Keep an outgoing sketch mounted until its last stroke has erased. */
+  transition: opacity 0s 700ms;
+}
+.doodle[data-active='true'] { opacity: .78; transition-delay: 0s; }
+.doodle svg { display: block; width: 100%; height: auto; overflow: visible; }
+.warm { color: var(--starlight); stroke: currentColor; }
+.particle { fill: currentColor; stroke: none; }
+
+/* Only the white mask moves. The actual pencil lines keep their dash patterns. */
+.trace {
+  stroke-linecap: butt;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 440ms ease-in;
+  transition-delay: calc(var(--stroke-order) * 18ms);
+}
+.doodle[data-active='true'] .trace {
+  stroke-dashoffset: 0;
+  transition-duration: 900ms;
+  transition-timing-function: cubic-bezier(.35, .05, .65, .95);
+  transition-delay: calc(var(--pen-delay) + var(--stroke-order) * 75ms);
+}
+
+@media (min-width: 1120px) and (min-height: 560px) { .margins { display: block; } }
+@media (prefers-reduced-motion: reduce) {
+  .trace, .doodle { transition: none; }
+}

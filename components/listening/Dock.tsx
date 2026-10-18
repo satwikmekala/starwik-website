@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 
-import { formatTime } from '@/app/frequencies/mixes'
+import { formatTime } from '@/app/music/mixes'
 import { useListening } from './context'
 import { Press } from './Press'
 import { Vinyl } from './Vinyl'
