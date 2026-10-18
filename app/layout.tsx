@@ -4,6 +4,7 @@ import { WorldTransitionProvider } from '@/components/planets/WorldTransition'
 import { ListeningRoomProvider } from '@/components/listening/ListeningRoomProvider'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.starwik.com'),
   title: '★wik',
   description: 'DJ · Builder · Drifter · Mid-Transmission',
 }
